@@ -17,21 +17,22 @@
 	switch($page)
 	{
 	    case "reunions" :
-	        include(CONTROLLER_DIR . "meetings.php");
+	        include(VIEW_DIR . "meetings.php");
 	        break;
 	    case "login" :
-	        include(CONTROLLER_DIR. "login.php");
+	        include(VIEW_DIR. "login.php");
 	        break;
 	    case "logout" :
-	        include(CONTROLLER_DIR . "logout.php");
+	        include(VIEW_DIR . "logout.php");
 	        break;
 	    case "create" : 
-	        include(CONTROLLER_DIR ."create.php");
+	        include(VIEW_DIR ."create.html");
+			break;
 	    case "register" :
-	        include(CONTROLLER_DIR . "register.php");
+	        include(VIEW_DIR . "register.html");
 	        break;
 		case "user" :
-			include(CONTROLLER_DIR . "user.php");
+			include(VIEW_DIR . "user.php");
 			break;
 		default:
 				include(VIEW_DIR . "home.html");

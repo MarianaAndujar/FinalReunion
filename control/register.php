@@ -102,10 +102,8 @@ include ("../model/MMembers.class.php");
 
 } // Fin isset $_POST
 	
-	else
-	{
-		echo"(!) FATAL ERROR 1337 (!) <br /> CODE : UUAP88 <br /> Veuillez 
-		contactez l'administrateur du site en lui communiquant le code de 
-		l'erreur : <a href=\"../index.php?uc=register\"> Nous contacter </a>";
-	} // Fin isset $_POST
+else
+{
+	echo"(!) FATAL ERROR 1337 (!) ";
+} // Fin isset $_POST
 ?>
