@@ -25,7 +25,7 @@ function renderTimelineHoursAdminSelector(parent, window_length, origin_date){
 		selector_labels_row.appendChild(selector_label_cell);
 		var selector_label = document.createElement("label");
 		selector_label.setAttribute("for", id_prefix+"_hour_"+i);
-		selector_label.textContent = i + ":00 - " + (i + window_length) + ":00";
+		selector_label.textContent = i + ":00 - " + (i + parseInt(window_length)) + ":00";
 		selector_label_cell.appendChild(selector_label);
 		
 		var selector_input_cell = document.createElement("td");
