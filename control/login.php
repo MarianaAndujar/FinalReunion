@@ -1,4 +1,5 @@
 <?php
+
 require ("../model/MMembers.class.php");
 	if($_POST['login'] == null || $_POST['paswd'] == null)
 	{
@@ -29,12 +30,12 @@ require ("../model/MMembers.class.php");
 			session_start();
 			$_SESSION['LOGIN'] = htmlentities($_POST['login']);
 			$_SESSION['PASSWD'] = htmlentities($_POST['paswd']);
-			echo "Vous êtes connecté";
+			header("Location: ../index.php?uc=home");
+			
 		}	
 		else
 		{
-			echo "Votre compte n'existe pas, ou votre login/mot de passe est 
-				incorrect";
+			header("Location: ../index.php?uc=home");
 		}
 	}
 
