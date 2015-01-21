@@ -6,11 +6,9 @@
 * 
 *	@date   21/01/2015
 * 
-*	@brief  Ici se trouve la class gérant les actions sur les utilisateurs
+*	@brief  Ici se trouve la class gï¿½rant les actions sur les utilisateurs
 *
 **/
-
-require 'db.php';
 
 class MMembers{
 
@@ -26,8 +24,7 @@ class MMembers{
 
 		try{
 			// connexion
-			$cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBUSER, 
-				DBPWD);
+			$cnx = new db();
 			$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
 			// preparer la requete
