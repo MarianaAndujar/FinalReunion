@@ -17,21 +17,21 @@
 	switch($page)
 	{
 	    case "reunions" :
-	        include("controlor/meetings.php");
+	        include("control/meetings.php");
 	        break;
 	    case "login" :
-	        include("controlor/login.php");
+	        include("control/login.php");
 	        break;
 	    case "logout" :
-	        include("controlor/logout.php");
+	        include("control/logout.php");
 	        break;
 	    case "create" : 
-	        include("controlor/create.php");
+	        include("control/create.php");
 	    case "register" :
-	        include("controlor/register.php");
+	        include("control/register.php");
 	        break;
 		case "user" :
-			include("controlor/user.php");
+			include("control/user.php");
 		default:
 				include("view/home.html");
 	
