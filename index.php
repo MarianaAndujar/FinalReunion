@@ -11,6 +11,10 @@
 	require_once(MODEL_DIR . "MMembers.class.php");
 	
 	// utilisation du controleur adapté
+	// on verifie que ce n'est pas vide
+	if(!isset($_REQUEST['uc'])){
+     	$_REQUEST['uc'] = 'home';
+	}
 	$page = $_REQUEST["uc"];
 	
 	// Redirection sur le controleur approprié
