@@ -90,4 +90,25 @@ class MMembers{
 		}	
 		return ($res->rowCount() == '1') ? TRUE : FALSE;
 	}
+	
+	public function update_User($login, $name, $surname, $tel, $email, $passwd){
+		try{
+				// connexion
+				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				
+				// preparer la requete
+				$req = "UPDATE USER SET NAME = '$name', SURNAME = '$surname', 
+						TEL = '$tel', EMAIL = '$email', PASSWD = '$passwd' 
+						WHERE LOGIN ='$login';";
+				$reqprep = $cnx->prepare($req);
+				$reqprep->execute(array($login));
+				
+				// deconnexion
+				$cnx = null;
+		}catch (PDOException $e){
+			die("exception");
+		}
+		
+	}
 }
