@@ -1,0 +1,5 @@
+
+SetEnv dbLogin 	"root"
+SetEnv dbPass 	""
+SetEnv dbBd 	"PROJECT"
+SetEnv dbHost 	"localhost"

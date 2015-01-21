@@ -1,0 +1,26 @@
+.timeline{
+	text-align: center;
+	width: 100%;
+	display: table;
+}
+
+.timeline div{
+	display: table-cell;
+	border: 1px solid black;
+}
+
+.timeline-year{
+	background: #555;
+}
+
+.timeline-month{
+	background: #aaa;
+}
+
+.timeline-day{
+	background: #ddd;
+}
+
+.timeline-hour{
+	background: #fff;
+}
