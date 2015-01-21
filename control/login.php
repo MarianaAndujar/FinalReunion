@@ -29,7 +29,7 @@ require ("../model/MMembers.class.php");
 		{
 			session_start();
 		
-			$USR = $member->getUser($log);
+			$USR = $member->getUser($login);
 
 			$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
 			$_SESSION["NOM"]		= htmlentities($USR['1']);
