@@ -13,12 +13,12 @@
 			      <ul class="nav navbar-nav">
 			        <li class="active"><a href="index.php?uc=home">Home</a></li>
 			        <li><a href="index.php?uc=meetings">Réunions</a></li>
-			        <?php if(isset($_SESSION['user'])){ ?>
+			        <?php if(isset($_SESSION['login'])){ ?>
 			        <li><a href="index.php?uc=create">Création Réunion</a></li>
 			        <?php } ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
-			      	<?php if(isset($_SESSION['user'])){ ?>
+			      	<?php if(!isset($_SESSION['login'])){ ?>
 						  <li><a href="index.php?uc=register"><span class="glyphicon glyphicon-user"> </span> Register</a></li>
 			        	  <li><a href="index.php?uc=login"><span class="glyphicon glyphicon-log-in"> </span> Login</a></li>
 					  <?php }else{ ?>
