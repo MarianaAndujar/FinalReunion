@@ -94,6 +94,7 @@ class MMembers{
 	public function update_User($login, $name, $surname, $tel, $email, $passwd){
 		try{
 				// connexion
+				$cnx = new db();
 				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
 				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				
@@ -102,7 +103,7 @@ class MMembers{
 						TEL = '$tel', EMAIL = '$email', PASSWD = '$passwd' 
 						WHERE LOGIN ='$login';";
 				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login));
+				$reqprep->execute(array($login, $name, $surname, $tel, $email, $passwd));
 				
 				// deconnexion
 				$cnx = null;
