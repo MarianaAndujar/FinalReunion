@@ -20,7 +20,7 @@ function renderTimelineHoursAdminSelector(parent, window_length, origin_date){
 	selector.appendChild(selector_inputs_row);
 	
 	var id_prefix = origin_date.name;
-	for(i = 0 ; i < 24 ; i++){
+	for(i = 0 ; i + parseInt(window_length) <= 24 ; i++){
 		var selector_label_cell = document.createElement("td");
 		selector_labels_row.appendChild(selector_label_cell);
 		var selector_label = document.createElement("label");
@@ -39,7 +39,7 @@ function renderTimelineHoursAdminSelector(parent, window_length, origin_date){
 	}
 	
 	var date_input = document.createElement("input");
-	$(date_input).datepicker();
+	$(date_input).datepicker({ dateFormat: 'dd-mm-yy' });
 	date_input.setAttribute("name", date_input.id);
 	parent.insertBefore(date_input, ref_elem);
 	
@@ -73,7 +73,7 @@ function renderAdminForm(parent_id, window_length){
 	window_length_button.setAttribute("type", "button");
 	window_length_button.textContent = "changer durée (réinitialise le formulaire)";
 	window_length_button.onclick = function(){
-		parent.parentNode.removeChild(parent);
+		parent.removeChild(form);
 		renderAdminForm(parent_id, window_length_input.value);
 		return null;
 	};
@@ -82,7 +82,7 @@ function renderAdminForm(parent_id, window_length){
 	form.appendChild(document.createElement("br"));
 	
 	var date_input = document.createElement("input");
-	$(date_input).datepicker();
+	$(date_input).datepicker({ dateFormat: 'dd-mm-yy' });
 	date_input.setAttribute("name", date_input.id);
 	form.appendChild(date_input);
 	
