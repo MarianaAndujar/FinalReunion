@@ -11,10 +11,6 @@
 	require_once(MODEL_DIR . "MMembers.class.php");
 	
 	// utilisation du controleur adapté
-	// on verifie que ce n'est pas vide
-	if(!isset($_REQUEST['uc'])){
-     	$_REQUEST['uc'] = 'home';
-	}
 	$page = $_REQUEST["uc"];
 	
 	// Redirection sur le controleur approprié
@@ -27,7 +23,7 @@
 	        include(VIEW_DIR. "login.html");
 	        break;
 	    case "logout" :
-	        include(VIEW_DIR . "logout.php");
+	        include(CONTROLLER_DIR . "logout.php");
 	        break;
 	    case "create" : 
 	        include(VIEW_DIR ."create.html");
