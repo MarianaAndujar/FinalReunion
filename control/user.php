@@ -65,5 +65,6 @@
 	$mail = $user.getMail();
 	$num = $user.getName();
 	$mdp = $user.getMdp();
-
+	
+	include(view/user.php);
 ?>
