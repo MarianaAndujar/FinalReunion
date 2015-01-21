@@ -72,17 +72,17 @@ class MMembers{
 	public function Who_I_Am($login)
 	{
 		try{
-				// connexion
-				$cnx = new db();
-				//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				
-				// preparer la requete
-				$req = "SELECT LOGIN FROM USER WHERE LOGIN = ?;";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login));
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "SELECT LOGIN FROM USER WHERE LOGIN = ?;";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($login));
 
-				// deconnexion
-				$cnx = null;
+			// deconnexion
+			$cnx = null;
 		}catch (PDOException $e){
 			die("exception : ". $e->getMessage());
 		}	
@@ -108,5 +108,27 @@ class MMembers{
 			die("exception : ". $e->getMessage());
 		}
 		
+	}
+	
+	public function getUser($login)
+	{
+		try{
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "SELECT ID_USER, NAME, SURNAME, TEL, EMAIL FROM USER 
+				WHERE LOGIN = ?;";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($login));
+			$result = $reqprep->fetch();
+			
+			// deconnexion
+			$cnx = null;
+		}catch (PDOException $e){
+			die("exception : ". $e->getMessage());
+		}	
+		return $result;
 	}
 }

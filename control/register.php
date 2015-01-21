@@ -96,13 +96,14 @@ include ("../model/MMembers.class.php");
 		session_start();
 		
 		$USR = $member->getUser($log);
-		$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
-		$_SESSION["NOM"]		= htmlentities($name);
-		$_SESSION["PRENOM"]		= htmlentities($surname);
-		$_SESSION["TEL"]		= htmlentities($tel);
-		$_SESSION["EMAIL"]		= htmlentities($mail);
 
-		header("Location: ../index.php");
+		$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+		$_SESSION["NOM"]		= htmlentities($USR['1']);
+		$_SESSION["PRENOM"]		= htmlentities($USR['2']);
+		$_SESSION["TEL"]		= htmlentities($USR['3']);
+		$_SESSION["EMAIL"]		= htmlentities($USR['4']);
+
+		//header("Location: ../index.php");
 	} // Fin if AddOK
 
 } // Fin isset $_POST
