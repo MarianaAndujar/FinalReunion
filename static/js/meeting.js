@@ -64,6 +64,7 @@ function renderAdminForm(parent_id, window_length){
 	var form = document.createElement("form");
 	form.setAttribute("method", "post");
 	form.setAttribute("action", "toast.html");
+	form.setAttribute("autocomplete", "off");
 	parent.appendChild(form);
 	
 	var window_length_input = document.createElement("input");
@@ -89,7 +90,7 @@ function renderAdminForm(parent_id, window_length){
 	add_button.setAttribute("type", "button");
 	add_button.textContent = "ajouter";
 	add_button.onclick = function(){
-		renderTimelineHoursAdminSelector(form, window_length, date_input);
+		renderTimelineHoursAdminSelector(form, window_length_input.value, date_input);
 		return false;
 	};
 	form.appendChild(add_button);
