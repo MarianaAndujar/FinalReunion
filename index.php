@@ -16,8 +16,8 @@
 	// Redirection sur le controleur approprié
 	switch($page)
 	{
-	    case "reunions" :
-	        include(VIEW_DIR . "meetings.php");
+	    case "meetings" :
+	        include(CONTROLLER_DIR . "meetings.php");
 	        break;
 	    case "login" :
 	        include(VIEW_DIR. "login.html");

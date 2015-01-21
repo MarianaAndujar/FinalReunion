@@ -11,10 +11,28 @@
 			    </div>
 			    <div class="navbar-collapse collapse" id="myNavbar">
 			      <ul class="nav navbar-nav">
-			        <li class="active"><a href="index.php?uc=home">Home</a></li>
-			        <li><a href="index.php?uc=meetings">Réunions</a></li>
+					<?php 
+						if($_GET['uc'] == 'home')
+							echo "<li class='active'>";
+						else
+							echo "<li>";
+					?>
+					<a href="index.php?uc=home">Home</a></li>
+			        <?php 
+						if($_GET['uc'] == 'meetings')
+							echo "<li class='active'>";
+						else
+							echo "<li>";
+					?>
+					<a href="index.php?uc=meetings">Réunions</a></li>
 			        <?php if(isset($_SESSION['NOM'])){ ?>
-			        <li><a href="index.php?uc=create">Création Réunion</a></li>
+			        <?php 
+						if($_GET['uc'] == 'create')
+							echo "<li class='active'>";
+						else
+							echo '<li>';
+					?>
+					<a href="index.php?uc=create">Création Réunion</a></li>
 			        <?php } ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
