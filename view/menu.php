@@ -14,7 +14,7 @@
 			        <li class="active"><a href="index.php?uc=home">Home</a></li>
 			        <li><a href="index.php?uc=meetings">Réunions</a></li>
 			        <?php if($user.is_not_anonymous()):?>
-			        <li><a href="index.php?uc=create">Création Sondage</a></li>
+			        <li><a href="index.php?uc=create">Création Réunion</a></li>
 			        <?php endif ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
