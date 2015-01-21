@@ -20,27 +20,27 @@ class MMembers{
     public function __destruct () {}
 	
 	//Ajout d'un utilisateur
-    public function Add_Member ($organisateur, $adresse, $code_postal, $ville, $intra, $tva, $prenom, $nom, $email, $telephone, $fax, $PASSWD_MEMBER, $rights, $salt1, $salt2)
+    public function Add_Member ($log, $name, $surname, $mail, $passwd, $tel, 
+		$salt)
     {
 
-			try{
-				// connexion
-				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
-				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				
-				// preparer la requete
-				$req = "SELECT prenom FROM users WHERE login=? AND password=?";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($_POST['login'], $_POST['passwd']));
-				
-				// afficher le resultat
-				if ($res = $reqprep->fetch(PDO::FETCH_ASSOC)){
-					echo "bonjour ", htmlentities($res['prenom'], ENT_QUOTES);
-				}
-				// deconnexion
-				$cnx = null;
-			}catch (PDOException $e){
-				die("exception");
-			}	
+		try{
+			// connexion
+			$cnx = new PDO("mysql:host=".HOST.";dbname=".DBNAME, DBUSER, 
+				DBPWD);
+			$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "INSERT INTO USER (LOGIN, NAME, SURNAME, TEL, EMAIL, PASSWD, 
+				SALT) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($log, $name, $surname, $tel, $mail, $passwd, 
+				$salt));
+			
+			// deconnexion
+			$cnx = null;
+		}catch (PDOException $e){
+			die("exception");
+		}	
     }
 }

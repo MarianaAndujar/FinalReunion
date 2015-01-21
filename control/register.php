@@ -11,9 +11,8 @@
 *
 **/
 
-//include ("../classes/MMembers.class.php");
+include ("../model/MMembers.class.php");
 // Création d'un nouvel utilisateur 
-
 	$AddOK = false;
 	//echo'<pre>';print_r($_POST);echo'</pre>';
 	if (isset($_POST['Add'])) 
@@ -34,8 +33,8 @@
 			$paswd2 	= 	addslashes($_POST['paswd2']);
 			$tel 		= 	addslashes($_POST['tel']);
 
-			//$member = new MMembers();
-
+			$member = new MMembers();
+			$test = $member->test();
 			//$exist = $member->Who_I_Am($_POST['email']);
 			//$Passwd = md5($_POST['PASSWD_MEMBER']); // Utilisé dans le salt
 			//$Passwd2 = md5($_POST['PASSWD_MEMBER2']);
