@@ -43,4 +43,54 @@ class MMembers{
 			die("exception");
 		}	
     }
+	
+	public function Get_Salt($login, $password)
+	{
+		try{
+				// connexion
+				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				
+				// preparer la requete
+				$req = "SELECT SALT FROM user WHERE LOGIN = ? AND PASSWD = ?;";
+				$reqprep = $cnx->prepare($req);
+				$reqprep->execute(array($login, $password));
+				$salt = $reqprep->fetch();
+				
+				// afficher le resultat
+				if ($res = $reqprep->fetch(PDO::FETCH_ASSOC)){
+					echo "bonjour ", htmlentities($res['prenom'], ENT_QUOTES);
+				}
+				// deconnexion
+				$cnx = null;
+		}catch (PDOException $e){
+			die("exception");
+		}
+		return $salt;
+		
+	}
+	
+	public function Who_I_Am($login)
+	{
+		try{
+				// connexion
+				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				
+				// preparer la requete
+				$req = "SELECT LOGIN FROM user WHERE LOGIN = ?;";
+				$reqprep = $cnx->prepare($req);
+				$reqprep->execute(array($login));
+				
+				// afficher le resultat
+				if ($res = $reqprep->fetch(PDO::FETCH_ASSOC)){
+					echo "bonjour ", htmlentities($res['prenom'], ENT_QUOTES);
+				}
+				// deconnexion
+				$cnx = null;
+		}catch (PDOException $e){
+			die("exception");
+		}	
+		return ($res->rowCount() == '1') ? TRUE : FALSE;
+	}
 }
