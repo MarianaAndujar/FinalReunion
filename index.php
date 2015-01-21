@@ -35,7 +35,7 @@
 			include(VIEW_DIR . "user.php");
 			break;
 		default:
-				include(VIEW_DIR . "home.html");
+				include(CONTROLLER_DIR . "home.html");
 	
 	}
 	

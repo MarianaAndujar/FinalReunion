@@ -17,7 +17,7 @@
 		<input type="text" name="num" ><?php echo $num; ?></input>
 		</br>
 		<label for="paswd">Mot de passe : </label>
-		<input type="text" name="password" ><?php echo $mdp ?></input>
+		<input type="text" name="password" >
 		</br>
 		<label for="paswd2">Confirmation du mot de passe : </label>
 		<input type="text" name="passwordValid" >

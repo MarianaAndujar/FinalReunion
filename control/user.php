@@ -60,12 +60,12 @@
 	}
 		
 	
-	$log = $user.getLog();
-	$name = $user.getName();
-	$surname = $user.getSurname();
-	$mail = $user.getMail();
-	$num = $user.getName();
-	$mdp = $user.getMdp();
+	$log = $_SESSION[''];
+	$name = $_SESSION[''];
+	$surname = $_SESSION[''];
+	$mail = $_SESSION[''];
+	$num = $_SESSION[''];
+	$mdp = $_SESSION[''];
 	
 	include(view/user.php);
 ?>
