@@ -28,8 +28,15 @@ require ("../model/MMembers.class.php");
 		if($password == $password2)
 		{
 			session_start();
-			$_SESSION['LOGIN'] = htmlentities($_POST['login']);
-			$_SESSION['PASSWD'] = htmlentities($_POST['paswd']);
+		
+			$USR = $member->getUser($log);
+
+			$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+			$_SESSION["NOM"]		= htmlentities($USR['1']);
+			$_SESSION["PRENOM"]		= htmlentities($USR['2']);
+			$_SESSION["TEL"]		= htmlentities($USR['3']);
+			$_SESSION["EMAIL"]		= htmlentities($USR['4']);
+
 			header("Location: ../index.php?uc=home");
 			
 		}	
