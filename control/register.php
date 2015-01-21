@@ -103,7 +103,7 @@ include ("../model/MMembers.class.php");
 		$_SESSION["TEL"]		= htmlentities($USR['3']);
 		$_SESSION["EMAIL"]		= htmlentities($USR['4']);
 
-		//header("Location: ../index.php");
+		header("Location: ../index.php");
 	} // Fin if AddOK
 
 } // Fin isset $_POST
