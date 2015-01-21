@@ -2,8 +2,8 @@
 	session_start();
 
 	// affichage des vues de l'en tete et du sommaire 
-	include("view/Header.php");	
-	include("view/Menu.php");
+	include("view/header.html");	
+	include("view/menu.html");
 
 	// instantiation de l'acces aux données
 	require_once("model/myPDO.php");
@@ -31,12 +31,10 @@
 	        include("controler/register.php");
 	        break;
 		default:
-				include("view/home.php");
+				include("view/home.html");
 	
 	}
 	
-	include("view/Footer.php");
-
-
+	include("view/footer.html");
 	
 ?>

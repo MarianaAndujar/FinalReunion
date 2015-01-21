@@ -1,0 +1,31 @@
+<nav class="navbar navbar-inverse">
+			  <div class="container-fluid">
+			  	<!-- Voir pourquoi le bouton ne marche pas !! -->
+			    <div class="navbar-header">
+			      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+			        <span class="icon-bar"> </span>
+			        <span class="icon-bar"> </span>
+			        <span class="icon-bar"> </span>                        
+			      </button>
+			      <a class="navbar-brand">Menu :</a>
+			    </div>
+			    <div class="navbar-collapse collapse" id="myNavbar">
+			      <ul class="nav navbar-nav">
+			        <li class="active"><a href="{% url 'home' %}">Home</a></li>
+			        <li><a href="{% url 'meetings' %}">Réunions</a></li>
+			        {% if not user.is_anonymous %}
+			        <li><a href="{% url 'create' %}">Création Sondage</a></li>
+			        {% endif %}	
+			      </ul>
+			      <ul class="nav navbar-nav navbar-right">
+			      	{% if user.is_anonymous %}
+			        <li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-user"> </span> Register</a></li>
+			        <li><a href="{% url 'django.contrib.auth.views.login' %}"><span class="glyphicon glyphicon-log-in"> </span> Login</a></li>
+			        {% else %}
+			        <li><a href="{% url 'user' %}"><span class="glyphicon glyphicon-user"> </span> {{user}}</a></li>
+			        <li><a href="{% url 'django.contrib.auth.views.logout' %}"><span class="glyphicon glyphicon-log-in"> </span> Logout</a></li>
+			        {% endif %}	
+			      </ul>
+			    </div>
+			  </div>
+			</nav>		
