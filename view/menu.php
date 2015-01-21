@@ -13,18 +13,18 @@
 			      <ul class="nav navbar-nav">
 			        <li class="active"><a href="index.php?uc=home">Home</a></li>
 			        <li><a href="index.php?uc=meetings">Réunions</a></li>
-			        <?php if($user.is_not_anonymous()):?>
+			        <?php if(isset($_SESSION['user'])){ ?>
 			        <li><a href="index.php?uc=create">Création Réunion</a></li>
-			        <?php endif ?>
+			        <?php } ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
-			      	<?php if ($user.is_valid()): ?>
+			      	<?php if(isset($_SESSION['user'])){ ?>
 						  <li><a href="index.php?uc=register"><span class="glyphicon glyphicon-user"> </span> Register</a></li>
 			        	  <li><a href="index.php?uc=login"><span class="glyphicon glyphicon-log-in"> </span> Login</a></li>
-					  <?php else: ?>
+					  <?php }else{ ?>
 						  <li><a href="index.php?uc=user"><span class="glyphicon glyphicon-user"> </span> <?php echo "user"?> </a></li>
 			        	  <li><a href="index.php?uc=logout"><span class="glyphicon glyphicon-log-in"> </span> Logout</a></li>
-					  <?php endif ?>
+					  <?php } ?>
 			      </ul>
 			    </div>
 			  </div>
