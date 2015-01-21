@@ -37,7 +37,12 @@ include ("../model/MMembers.class.php");
 			$exist = $member->Who_I_Am($log);
 			$part1 	= hash('sha1', $paswd);
 			$part2 	= hash('sha1', $paswd2);
-			if($exist == false)
+			
+			$pattern = "/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/";
+			
+			$mailok = preg_match($pattern, $mail);
+			
+			if($exist == false && $mailok == 1)
 			{
 				if($paswd == $paswd2)	
 				{	
@@ -57,9 +62,9 @@ include ("../model/MMembers.class.php");
 										$name,
 										$surname,
 										$mail,
-										$paswd,
-										$paswd2,
-										$tel );		
+										$passwd,
+										$tel, 
+										$salt);		
 										
 					$AddOK = true;
 				} // Fin test des mots de passes
@@ -74,7 +79,7 @@ include ("../model/MMembers.class.php");
 			}// Fin verification si l'utilisateur exist déjà
 
 			else{
-				echo "Ce nom d'utilisateur n'est pas disponible.";
+				echo "Le nom d'utilisateur ou l'adresse mail est invalide";
 			}
 			
 	} // Fin if $_post null
@@ -102,8 +107,10 @@ include ("../model/MMembers.class.php");
 
 } // Fin isset $_POST
 	
-else
-{
-	echo"(!) FATAL ERROR 1337 (!) ";
-} // Fin isset $_POST
+	else
+	{
+		echo"(!) FATAL ERROR 1337 (!) <br /> CODE : UUAP88 <br /> Veuillez 
+		contactez l'administrateur du site en lui communiquant le code de 
+		l'erreur : <a href=\"../index.php?uc=register\"> Nous contacter </a>";
+	} // Fin isset $_POST
 ?>

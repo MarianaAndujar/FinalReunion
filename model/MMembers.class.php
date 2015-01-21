@@ -10,6 +10,8 @@
 *
 **/
 
+require_once(dirname(__FILE__) . "/../config.inc.php");
+
 class MMembers{
 
 	//constructeur / destructeur
@@ -37,7 +39,7 @@ class MMembers{
 			// deconnexion
 			$cnx = null;
 		}catch (PDOException $e){
-			die("exception");
+			die("exception : ". $e->getMessage());
 		}	
     }
 	
@@ -71,45 +73,40 @@ class MMembers{
 	{
 		try{
 				// connexion
-				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
-				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				
-				// preparer la requete
-				$req = "SELECT LOGIN FROM user WHERE LOGIN = ?;";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login));
-				
-				// afficher le resultat
-				if ($res = $reqprep->fetch(PDO::FETCH_ASSOC)){
-					echo "bonjour ", htmlentities($res['prenom'], ENT_QUOTES);
-				}
-				// deconnexion
-				$cnx = null;
-		}catch (PDOException $e){
-			die("exception");
-		}	
-		return ($res->rowCount() == '1') ? TRUE : FALSE;
-	}
-	
-	public function Get_Info($login)
-	{
-		try{
-				// connexion
 				$cnx = new db();
-				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				
 				// preparer la requete
-				$req = "SELECT PASSWD, SALT FROM user WHERE LOGIN = ?;";
+				$req = "SELECT LOGIN FROM USER WHERE LOGIN = ?;";
 				$reqprep = $cnx->prepare($req);
 				$reqprep->execute(array($login));
-				$res = ($reqprep->rowCount() > '0') ? $reqprep->fetch() : array();
 
 				// deconnexion
 				$cnx = null;
 		}catch (PDOException $e){
-			die("exception Get_Info");
+			die("exception : ". $e->getMessage());
+		}	
+		return ($reqprep->rowCount() == '1') ? TRUE : FALSE;
+	}
+	
+	public function update_User($login, $name, $surname, $tel, $email, $passwd){
+		try{
+				// connexion
+				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				
+				// preparer la requete
+				$req = "UPDATE USER SET NAME = '$name', SURNAME = '$surname', 
+						TEL = '$tel', EMAIL = '$email', PASSWD = '$passwd' 
+						WHERE LOGIN ='$login';";
+				$reqprep = $cnx->prepare($req);
+				$reqprep->execute(array($login));
+				
+				// deconnexion
+				$cnx = null;
+		}catch (PDOException $e){
+			die("exception : ". $e->getMessage());
 		}
 		
-		return $res;
 	}
 }
