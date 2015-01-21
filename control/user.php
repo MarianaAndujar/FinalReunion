@@ -55,6 +55,7 @@
 	
 	if ($AddOK)
 	{
+		
 		echo "Les modificetions ont bien été enregistré.";
 	}
 		

@@ -3,7 +3,7 @@
 		<?php echo $log; ?>
 	</h3>
 	
-	<form method="post" action="../control/user.php&action=modifier">
+	<form method="post" action="../control/user.php">
 		<label for="name">Nom : </label>
 		<?php echo $name; ?>
 		</br>

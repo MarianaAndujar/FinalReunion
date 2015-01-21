@@ -34,12 +34,11 @@ include ("../model/MMembers.class.php");
 			$tel 		= 	addslashes($_POST['tel']);
 
 			$member = new MMembers();
-			$test = $member->test();
-			//$exist = $member->Who_I_Am($_POST['email']);
-			//$Passwd = md5($_POST['PASSWD_MEMBER']); // Utilisé dans le salt
-			//$Passwd2 = md5($_POST['PASSWD_MEMBER2']);
-			//if(empty($exist['0']))
-			//{
+			$exist = $member->Who_I_Am($log);
+			$part1 	= hash('sha1', $paswd);
+			$part2 	= hash('sha1', $paswd2);
+			if($exist == false)
+			{
 				if($paswd == $paswd2)	
 				{	
 					$part1 	= hash('md5', $log);
@@ -49,64 +48,62 @@ include ("../model/MMembers.class.php");
 					
 					//Mise en forme du mot de passe
 					$passwd	= $part1.$salt.$part2;
+					
+					if (!preg_match("/^(\+)?\d{10,14}$/", $tel)){
+						$tel = null;
+					}
 
-					echo strlen($passwd);
-					/*$member->Add_Member($log,
+					$member->Add_Member($log,
 										$name,
 										$surname,
 										$mail,
 										$paswd,
 										$paswd2,
-										$tel );		*/
+										$tel );		
+										
 					$AddOK = true;
 				} // Fin test des mots de passes
 				
 				else 
 				{
-					echo "Les mots de passes que vous nous avez spécifiez, ne sont pas identique. <a href=\"../commande.php\"> Revenir à la page précédente </a>";
+					echo "Les mots de passes que vous nous avez spécifiez, ne 
+					sont pas identique.<a href=\"../index.php?uc=register\"> 
+					Revenir à la page précédente </a>";
 				} // Fin else mots de passes
 				
-			//}// Fin verification si l'utilisateur exist déjà		
+			}// Fin verification si l'utilisateur exist déjà
+
+			else{
+				echo "Ce nom d'utilisateur n'est pas disponible.";
+			}
 			
 	} // Fin if $_post null
 		
 	else
 	{
-		echo "Veuillez remplir tous les champs obligatoire. <a href=\"../commande.php\"> Revenir à la page précédente </a>";
+		echo "Veuillez remplir tous les champs obligatoire. 
+		<a href=\"../index.php?uc=register\"> Revenir à la page précédente </a>"
+		;
 	} // Fin else verif utilisateur
 		
 	if ($AddOK)
 	{
 		session_start();
-			
-			/*echo'<pre>';print_r($exist);echo'</pre>';
-			echo'<pre>';print_r($exist['0']);echo'</pre>';
-			echo'<pre>';print_r($exist['0']['0']);echo'</pre>';*/
 		
-			/*$USR = $member->Who_I_Am($_POST['email']);
-			$_SESSION["USR_ID"] = htmlentities($USR['0']);
-			$_SESSION["PRENOM"]	= htmlentities($_POST['prenom']);
-			$_SESSION["NOM"]	= htmlentities($_POST['nom']);
-			$_SESSION["ADRS"]	= htmlentities($_POST['adresse']);
-			$_SESSION["CP"]		= htmlentities($_POST['code_postal']);
-			$_SESSION["VILLE"]	= htmlentities($_POST['ville']);
-			$_SESSION["BOITE"]	= htmlentities($_POST['organisateur']);
-			$_SESSION["MAIL"]	= htmlentities($_POST['email']);
-			$_SESSION["TEL"]	= htmlentities($_POST['telephone']);
-			$_SESSION["FAX"]	= htmlentities($_POST['fax']);
-			$_SESSION["INTRA"]	= htmlentities($_POST['tva']);
-			$_SESSION["TVA"]	= htmlentities($_POST['liste']);
-			$_SESSION["RIGHTS"] = '1';
-			$_SESSION["CMD"]	= '0';*/
-			
-		
-			//header("Location: ../panier_presta.php");
+		$USR = $member->getUser($log);
+		$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+		$_SESSION["NOM"]		= htmlentities($name);
+		$_SESSION["PRENOM"]		= htmlentities($surname);
+		$_SESSION["TEL"]		= htmlentities($tel);
+		$_SESSION["EMAIL"]		= htmlentities($mail);
+
+		header("Location: ../index.php");
 	} // Fin if AddOK
 
 } // Fin isset $_POST
 	
-	else
-	{
-		echo"(!) FATAL ERROR 1337 (!) <br /> CODE : UUAP88 <br /> Veuillez contactez l'administrateur du site en lui communiquant le code de l'erreur : <a href=\"../contact.php\"> Nous contacter </a>";
-	} // Fin isset $_POST
+else
+{
+	echo"(!) FATAL ERROR 1337 (!) ";
+} // Fin isset $_POST
 ?>
