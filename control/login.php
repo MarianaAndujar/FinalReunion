@@ -18,9 +18,11 @@ require ("../model/MMembers.class.php");
 		$salt = "";
 		if($info != array())
 		{
-			$salt = $info[1];
 			$password2 = $info[0];
+			$salt = $info[1];
 		}
+		
+		$password = $part1.$salt.$part2;
 		
 		if($password == $password2)
 		{
@@ -31,7 +33,8 @@ require ("../model/MMembers.class.php");
 		}	
 		else
 		{
-			echo "Votre compte n'existe pas, ou votre login/mot de passe est incorrect";
+			echo "Votre compte n'existe pas, ou votre login/mot de passe est 
+				incorrect";
 		}
 	}
 

@@ -43,29 +43,25 @@ class MMembers{
 		}	
     }
 	
-	public function Get_Salt($login, $password)
+	public function Get_Info($login)
 	{
 		try{
 				// connexion
-				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx = new db();
 				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				
 				// preparer la requete
-				$req = "SELECT SALT FROM user WHERE LOGIN = ? AND PASSWD = ?;";
+				$req = "SELECT PASSWD, SALT FROM user WHERE LOGIN = ?;";
 				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login, $password));
-				$salt = $reqprep->fetch();
+				$reqprep->execute(array($login));
+				$result = $reqprep->fetch();
 				
-				// afficher le resultat
-				if ($res = $reqprep->fetch(PDO::FETCH_ASSOC)){
-					echo "bonjour ", htmlentities($res['prenom'], ENT_QUOTES);
-				}
 				// deconnexion
 				$cnx = null;
 		}catch (PDOException $e){
 			die("exception");
 		}
-		return $salt;
+		return $result;
 		
 	}
 	
