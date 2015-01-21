@@ -3,7 +3,7 @@
 
 	// affichage des vues de l'en tete et du sommaire 
 	include("view/header.html");	
-	include("view/menu.html");
+	include("view/menu.php");
 
 	// instantiation de l'acces aux données
 	require_once("model/myPDO.php");
