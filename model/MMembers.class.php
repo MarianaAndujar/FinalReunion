@@ -90,4 +90,26 @@ class MMembers{
 		}	
 		return ($res->rowCount() == '1') ? TRUE : FALSE;
 	}
+	
+	public function Get_Info($login)
+	{
+		try{
+				// connexion
+				$cnx = new db();
+				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				
+				// preparer la requete
+				$req = "SELECT PASSWD, SALT FROM user WHERE LOGIN = ?;";
+				$reqprep = $cnx->prepare($req);
+				$reqprep->execute(array($login));
+				$res = ($reqprep->rowCount() > '0') ? $reqprep->fetch() : array();
+
+				// deconnexion
+				$cnx = null;
+		}catch (PDOException $e){
+			die("exception Get_Info");
+		}
+		
+		return $res;
+	}
 }
