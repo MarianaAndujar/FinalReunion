@@ -20,7 +20,7 @@
 	        include(VIEW_DIR . "meetings.php");
 	        break;
 	    case "login" :
-	        include(VIEW_DIR. "login.php");
+	        include(VIEW_DIR. "login.html");
 	        break;
 	    case "logout" :
 	        include(VIEW_DIR . "logout.php");
@@ -35,7 +35,8 @@
 			include(VIEW_DIR . "user.php");
 			break;
 		default:
-				include(VIEW_DIR . "home.html");
+			include(VIEW_DIR . "home.html");
+			break;
 	
 	}
 	
