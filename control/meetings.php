@@ -12,7 +12,7 @@ class MeetingController extends CoreController{
 	public static function listMeetings($offset=0, $limit=20){}
 	
 	public static function newMeeting(){
-		include(VIEW_DIR . "newmeeting.html");
+		include(VIEW_DIR . "newmeeting.php");
 	}
 	
 	/**
@@ -41,7 +41,7 @@ class MeetingController extends CoreController{
 			array_flip($hours_fields_keys));
 			
 		var_dump($dates_fields);
-		var_dump($hours_fields);
+		var_dump($_POST['hours_dp1421966564388']);
 	}
 	
 	public static function showMeeting(){}
