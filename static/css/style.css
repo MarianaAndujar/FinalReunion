@@ -1,12 +1,15 @@
 .timeline{
 	text-align: center;
-	width: 100%;
 	display: table;
 }
 
 .timeline div{
 	display: table-cell;
 	border: 1px solid black;
+}
+
+.timeline label{
+	display: block;
 }
 
 .timeline-year{

@@ -67,12 +67,23 @@ function renderAdminForm(parent_id, window_length){
 	form.setAttribute("autocomplete", "off");
 	parent.appendChild(form);
 	
+	var meeting_name_input = document.createElement("input");
+	meeting_name_input.setAttribute("type", "text");
+	meeting_name_input.setAttribute("name", "meeting_name");
+	form.appendChild(meeting_name_input);
+	
+	var meeting_desc_input = document.createElement("input");
+	meeting_desc_input.setAttribute("type", "text");
+	meeting_desc_input.setAttribute("type", "meeting_description");
+	form.appendChild(meeting_desc_input);
+	
 	var window_length_input = document.createElement("input");
 	window_length_input.setAttribute("value", window_length);
 	var window_length_button = document.createElement("button");
 	window_length_button.setAttribute("type", "button");
 	window_length_button.textContent = "changer durée (réinitialise le formulaire)";
 	window_length_button.onclick = function(){
+		//TODO: get previous settings and rebind them to the new form
 		parent.removeChild(form);
 		renderAdminForm(parent_id, window_length_input.value);
 		return null;
@@ -102,8 +113,7 @@ function renderAdminForm(parent_id, window_length){
 }
 
 function renderTimelineSelector(parent, datetimes, window_length){
-	var timeline_div = document.createElement("div");
-	document.getElementById(parent).appendChild(timeline_div);
+	var timeline_div = document.getElementById(parent);
 	
 	datetimes.forEach(function(year, index, array){
 		//console.log(year);

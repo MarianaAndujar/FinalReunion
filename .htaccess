@@ -3,3 +3,10 @@ SetEnv dbLogin 	"root"
 SetEnv dbPass 	""
 SetEnv dbBd 	"PROJECT"
 SetEnv dbHost 	"localhost"
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+	RewriteBase /FinalReunion/
+	RewriteRule ^static/(.*)$	static/$1 [NC,L]
+	RewriteRule ^([a-z]+)/?$	index.php?uc=$1 [NC,L]
+</IfModule>
