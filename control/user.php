@@ -65,7 +65,7 @@ session_start();
 			$_SESSION["EMAIL"]		= htmlentities($USR['4']);
 	
 			header("Location: ../index.php?uc=user");
-		} // Fin if AddOK
+		} 
 	}
 	
 	
@@ -81,12 +81,23 @@ session_start();
 					$paswd2 	= 	addslashes($_POST['passwordValid']);
 					
 					$member = new MMembers();
+					$id = addslashes($_SESSION['USER_ID']);
 					$log = $member->getLoginById($id);
 					$part1 	= hash('sha1', $paswd);
 					$part2 	= hash('sha1', $paswd2);
-					$verifOldmdp = $member->Get_Info($log);
+					$verifOldmdp = $member->Get_Info($log[0]);
 					
-					if($passOld == $verifOldmdp[0]){
+					// Partie de la mise en forme du mdp
+					//rentré par l'utilisateur
+					$hash1 = hash('sha1', $passOld);
+					$hash1 = hash('sha1', $passOld);
+					$debut = hash('md5', $log[0]);
+					$fin = hash('gost', $passOld);
+					$salt	= $log[1];
+					$hashpass = $debut.$salt.$fin;
+					
+					
+					if($hashpass == $verifOldmdp[0]){
 						if($paswd == $paswd2)	
 						{	
 							$part1 	= hash('md5', $log[0]);

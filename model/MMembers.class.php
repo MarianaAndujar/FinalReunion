@@ -105,12 +105,12 @@ class MMembers{
 			// preparer la requete
 			$req = "UPDATE USER SET NAME = ?, SURNAME = ?, 
 					TEL = ?, EMAIL = ? 
-					WHERE USER_ID = ?;";
+					WHERE ID_USER = ?;";
 			$reqprep = $cnx->prepare($req);
 			$reqprep->bindParam(1, $name, 		PDO::PARAM_STR);
 			$reqprep->bindParam(2, $surname, 	PDO::PARAM_STR);
-			$reqprep->bindParam(3, $$tel, 		PDO::PARAM_STR);
-			$reqprep->bindParam(4, $$email, 	PDO::PARAM_STR);
+			$reqprep->bindParam(3, $tel, 		PDO::PARAM_STR);
+			$reqprep->bindParam(4, $email, 		PDO::PARAM_STR);
 			$reqprep->bindParam(5, $id, 		PDO::PARAM_INT);
 			$reqprep->execute();
 				
@@ -151,9 +151,10 @@ class MMembers{
 				$cnx = new db();
 				
 				// preparer la requete
-				$req = "UPDATE USER SET PASSWD = '$mdp'	WHERE USER_ID ='$id';";
+				$req = "UPDATE USER SET PASSWD = ?	WHERE ID_USER = ?;";
 				$reqprep = $cnx->prepare($req);
-				$reqprep->bindParam(1, $id, 	PDO::PARAM_STR);
+				$reqprep->bindParam(2, $id, 	PDO::PARAM_INT);
+				$reqprep->bindParam(1, $mdp, 	PDO::PARAM_STR);
 				$reqprep->execute();
 				
 				// deconnexion
@@ -161,5 +162,26 @@ class MMembers{
 		}catch (PDOException $e){
 			die("exception : ". $e->getMessage());
 		}
+	}
+	
+	public function getLoginById($id){
+		try{
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "SELECT LOGIN, SALT FROM USER WHERE ID_USER = ?;";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->bindParam(1, $id, 	PDO::PARAM_STR);
+			$reqprep->execute(array($id));
+			$result = $reqprep->fetch();
+			
+			// deconnexion
+			$cnx = null;
+		}catch (PDOException $e){
+			die("exception : ". $e->getMessage());
+		}	
+		return $result;
 	}
 }
