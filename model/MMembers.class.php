@@ -129,5 +129,25 @@ class MMembers{
 		}	
 		return $result;
 	}
+	
+	public function getLoginById($id){
+		try{
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "SELECT LOGIN, SALT FROM USER WHERE ID_USER = '$id';";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($id));
+			$result = $reqprep->fetch();
+			
+			// deconnexion
+			$cnx = null;
+		}catch (PDOException $e){
+			die("exception : ". $e->getMessage());
+		}	
+		return $result;
+	}
 
 }
