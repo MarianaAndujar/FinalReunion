@@ -33,8 +33,18 @@ class MMembers{
 			$req = "INSERT INTO USER (LOGIN, NAME, SURNAME, TEL, EMAIL, PASSWD, 
 				SALT) VALUES (?, ?, ?, ?, ?, ?, ?)";
 			$reqprep = $cnx->prepare($req);
-			$reqprep->execute(array($log, $name, $surname, $tel, $mail, $passwd, 
-				$salt));
+			
+			// Etant donnée qu'une sqli est passé avec l'utilisation seule de 
+			// la méthode prepare de PDO, en utilisant la methode bind en plus
+			// cela protège apparement mieux
+			$reqprep->bindParam(1, $log, 		PDO::PARAM_STR);
+			$reqprep->bindParam(2, $name, 		PDO::PARAM_STR);
+			$reqprep->bindParam(3, $surname, 	PDO::PARAM_STR);
+			$reqprep->bindParam(4, $tel, 		PDO::PARAM_STR);
+			$reqprep->bindParam(5, $mail, 		PDO::PARAM_STR);
+			$reqprep->bindParam(6, $passwd, 	PDO::PARAM_STR);
+			$reqprep->bindParam(7, $salt, 		PDO::PARAM_STR);
+			$reqprep->execute();
 			
 			// deconnexion
 			$cnx = null;
@@ -53,7 +63,8 @@ class MMembers{
 				// preparer la requete
 				$req = "SELECT PASSWD, SALT FROM user WHERE LOGIN = ?;";
 				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login));
+				$reqprep->bindParam(1, $login, 	PDO::PARAM_STR);
+				$reqprep->execute();
 				$result = $reqprep->fetch();
 				
 				// deconnexion
@@ -75,7 +86,8 @@ class MMembers{
 			// preparer la requete
 			$req = "SELECT LOGIN FROM USER WHERE LOGIN = ?;";
 			$reqprep = $cnx->prepare($req);
-			$reqprep->execute(array($login));
+			$reqprep->bindParam(1, $login, 	PDO::PARAM_STR);
+			$reqprep->execute();
 
 			// deconnexion
 			$cnx = null;
@@ -87,18 +99,23 @@ class MMembers{
 	
 	public function update_User($id, $name, $surname, $tel, $email){
 		try{
-				// connexion
-				$cnx = new db();
+			// connexion
+			$cnx = new db();
 				
-				// preparer la requete
-				$req = "UPDATE USER SET NAME = '$name', SURNAME = '$surname', 
-						TEL = '$tel', EMAIL = '$email' 
-						WHERE USER_ID ='$id';";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($id));
+			// preparer la requete
+			$req = "UPDATE USER SET NAME = ?, SURNAME = ?, 
+					TEL = ?, EMAIL = ? 
+					WHERE USER_ID = ?;";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->bindParam(1, $name, 		PDO::PARAM_STR);
+			$reqprep->bindParam(2, $surname, 	PDO::PARAM_STR);
+			$reqprep->bindParam(3, $$tel, 		PDO::PARAM_STR);
+			$reqprep->bindParam(4, $$email, 	PDO::PARAM_STR);
+			$reqprep->bindParam(5, $id, 		PDO::PARAM_INT);
+			$reqprep->execute();
 				
-				// deconnexion
-				$cnx = null;
+			// deconnexion
+			$cnx = null;
 		}catch (PDOException $e){
 			die("exception : ". $e->getMessage());
 		}
@@ -116,6 +133,7 @@ class MMembers{
 			$req = "SELECT ID_USER, NAME, SURNAME, TEL, EMAIL FROM USER 
 				WHERE LOGIN = ?;";
 			$reqprep = $cnx->prepare($req);
+			$reqprep->bindParam(1, $login, 	PDO::PARAM_STR);
 			$reqprep->execute(array($login));
 			$result = $reqprep->fetch();
 			
@@ -135,7 +153,8 @@ class MMembers{
 				// preparer la requete
 				$req = "UPDATE USER SET PASSWD = '$mdp'	WHERE USER_ID ='$id';";
 				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($id));
+				$reqprep->bindParam(1, $id, 	PDO::PARAM_STR);
+				$reqprep->execute();
 				
 				// deconnexion
 				$cnx = null;
