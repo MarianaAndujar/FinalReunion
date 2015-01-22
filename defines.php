@@ -1,4 +1,5 @@
 <?php
+	define("BASE_URI", "/FinalReunion");
 	define("ROOT_DIR", dirname(__FILE__) . "/");
 	define("MODEL_DIR", ROOT_DIR . "model/");
 	define("VIEW_DIR", ROOT_DIR . "view/");

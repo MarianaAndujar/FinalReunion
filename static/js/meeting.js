@@ -63,7 +63,7 @@ function renderAdminForm(parent_id, window_length){
 	
 	var form = document.createElement("form");
 	form.setAttribute("method", "post");
-	form.setAttribute("action", "toast.html");
+	form.setAttribute("action", "create");
 	form.setAttribute("autocomplete", "off");
 	parent.appendChild(form);
 	
@@ -168,8 +168,6 @@ function getDates(meeting_id){
 	
 }
 
-$(document).ready(renderAdminForm("selector-container", 2));
-
 var dates = [
 	{
 		"year": 2014, 
@@ -210,5 +208,3 @@ var dates = [
 		]
 	}
 ];
-
-$(document).ready(renderTimelineSelector("voter-container", dates, 2));

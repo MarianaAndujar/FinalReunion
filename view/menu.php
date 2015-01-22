@@ -18,14 +18,14 @@
 						else
 							echo "<li>";
 					?>
-					<a href="index.php?uc=home">Home</a></li>
+					<a href="<?php echo BASE_URI;?>/home">Home</a></li>
 			        <?php 
 						if($current_page == 'meetings')
 							echo "<li class='active'>";
 						else
 							echo "<li>";
 					?>
-					<a href="index.php?uc=meetings">Réunions</a></li>
+					<a href="<?php echo BASE_URI;?>/meetings">Réunions</a></li>
 			        <?php if(isset($_SESSION['NOM'])){ ?>
 			        <?php 
 						if($current_page == 'create')
@@ -33,16 +33,16 @@
 						else
 							echo '<li>';
 					?>
-					<a href="index.php?uc=create">Création Réunion</a></li>
+					<a href="<?php echo BASE_URI;?>/create">Création Réunion</a></li>
 			        <?php } ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
 			      	<?php if(!isset($_SESSION['NOM'])){ ?>
-						  <li><a href="index.php?uc=register"><span class="glyphicon glyphicon-user"> </span> Register</a></li>
-			        	  <li><a href="index.php?uc=login"><span class="glyphicon glyphicon-log-in"> </span> Login</a></li>
+						  <li><a href="<?php echo BASE_URI;?>/register"><span class="glyphicon glyphicon-user"> </span> Register</a></li>
+			        	  <li><a href="<?php echo BASE_URI;?>/login"><span class="glyphicon glyphicon-log-in"> </span> Login</a></li>
 					  <?php }else{ ?>
-						  <li><a href="index.php?uc=user"><span class="glyphicon glyphicon-user"> </span> <?php echo $_SESSION['PRENOM'];?> </a></li>
-			        	  <li><a href="index.php?uc=logout"><span class="glyphicon glyphicon-log-in"> </span> Logout</a></li>
+						  <li><a href="<?php echo BASE_URI;?>/user"><span class="glyphicon glyphicon-user"> </span> <?php echo $_SESSION['PRENOM'];?> </a></li>
+			        	  <li><a href="<?php echo BASE_URI;?>/logout"><span class="glyphicon glyphicon-log-in"> </span> Logout</a></li>
 					  <?php } ?>
 			      </ul>
 			    </div>

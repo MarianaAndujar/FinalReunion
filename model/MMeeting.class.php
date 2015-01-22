@@ -7,11 +7,14 @@
 *	@date   21/01/2015
 * 
 *	@brief  Ici se trouve la class gerant les actions sur les meetings
-*
 **/
 
 require_once(dirname(__FILE__) . "/../config.inc.php");
 
+
+/**
+ * Réunion
+ */
 class MMeeting{
 
 	//constructeur / destructeur
@@ -19,17 +22,61 @@ class MMeeting{
 
     public function __destruct () {}
 	
-	/*Ajout d'un meeting
-		$description peut �tre null. $user = id_user (via $_SESSION['id_user'])
-	*/
-    public function addMeeting ($subject, $description, $locate, $duration, 
-		$user)
+	
+	/**
+	 * 
+	 */
+	public static function getMeetings($offset=0, $limit=20){
+		try{
+			$dbh = new db();
+			
+			$stmt = $dbh->prepare("SELECT * FROM MEETING 
+									LIMIT :offset, :limit");
+			$stmt.bindParam(":offset", $offset);
+			$stmt.bindParam(":limit", $limit);
+			
+			$stmt.execute();
+			
+			return $stmt->fetchAll(PDO::FETCH_ASSOC);
+		}catch(PDOException $e){
+			die($e->getMessage());
+		}
+	}
+	
+	/**
+	 * Récupération d'une réunion à partir de son id
+	 * 
+	 * @param int $meeting_id id de la réunion que l'on souhaite obtenir
+	 * 
+	 * @return mixed[] Renvoie la réunion comme un tableau associatif
+	 */
+	public static function getMeetingById($meeting_id){
+		try{
+			$dbh = new db();
+			
+			$stmt = $dbh->prepare("SELECT * FROM MEETING 
+									WHERE ID_MEETING = :id");
+			$stmt.bindParam(":id", $meeting_id);
+			
+			$stmt.execute();
+			
+			return $stmt->fetch(PDO::FETCH_ASSOC);
+		}catch(PDOException $e){
+			die($e->getMessage());
+		}
+	}
+	
+	/**
+	 * Ajout d'un meeting
+	 * 
+	 */
+    public static function addMeeting ($subject, $description, $locate, 
+    	$duration, $user)
     {
 
 		try{
 			// connexion
-			$cnx = new db();
-			$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$dbh = new db();
 			
 			// preparer la requete
 			$req = "INSERT INTO MEETING (SUBJECT, DESCRIPTION, LOCATION, 
@@ -56,7 +103,7 @@ class MMeeting{
 		try{
 				// connexion
 				$cnx = new db();
-				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				
 				// preparer la requete
 				$req = "INSERT INTO DATE (DDAY, ID_MEETING) VALUES (?, ?)";
@@ -70,7 +117,7 @@ class MMeeting{
 		}
 	}
 	
-	public function getMeetingId($subject, $user)
+	public static function getMeetingId($subject, $user)
 	{
 		try{
 			// connexion
@@ -78,8 +125,8 @@ class MMeeting{
 			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
 			// preparer la requete
-			$req = "SELECT ID_MEETING FROM MEETING WHERE SUBJECT = ? AND ID_USER
-				= ?;";
+			$req = "SELECT ID_MEETING FROM MEETING 
+					WHERE SUBJECT = ? AND ID_USER = ?;";
 			$reqprep = $cnx->prepare($req);
 			$reqprep->execute(array($subject, $user));
 			$result = $reqprep->fetch();
@@ -97,7 +144,7 @@ class MMeeting{
 	public function update_User($login, $name, $surname, $tel, $email, $passwd){
 		try{
 				// connexion
-				$cnx = new PDO("mysql:host=$host;dbname=$db_name", $db_user, $db_pwd);
+				$cnx = new db()
 				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 				
 				// preparer la requete
