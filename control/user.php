@@ -12,102 +12,115 @@
 **/
 session_start();
 	include ("../model/MMembers.class.php");
-
-$id = $_SESSION["USER_ID"];
-$AddOK = false;
-	//echo'<pre>';print_r($_POST);echo'</pre>';
-	if (isset($_POST['valid'])) 
-	{
-		if ( 
-				$_POST['name'] 		!= null && 
-				$_POST['surname'] 	!= null &&					
-				$_POST['mail'] 		!= null &&
-				$_POST['num']		!= null &&
-				$_POST['password'] 	!= null &&
-				$_POST['passwordValid'])
-		{
-			// Prot�ction XSS
-			$name 		= 	addslashes($_POST['name']);
-			$surname	= 	addslashes($_POST['surname']);
-			$mail		= 	addslashes($_POST['mail']);
-			$paswd	 	= 	addslashes($_POST['password']);
-			$paswd2 	= 	addslashes($_POST['passwordValid']);
-			$tel 		= 	addslashes($_POST['num']);
-
-			$member = new MMembers();
-			$log = $member->getLoginById($id);
-			$part1 	= hash('sha1', $paswd);
-			$part2 	= hash('sha1', $paswd2);
-			
+	
+	$validMdp = false;
+	$valid = false;
+	
+	if (isset($_POST['valid'])) {
+		if($_POST['name'] == null){
+			$name = addslashes($_SESSION['NOM']);
+		}else{
+			$name = addslashes($_POST['name']);
+		}
+		
+		if($_POST['mail'] == null){
+			$mail = addslashes($_SESSION['EMAIL']);
+			$mailoK = 1;
+		}else{
+			$mail = addslashes($_POST['mail']);
 			$pattern = "/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/";
-			
-			$mailok = preg_match($pattern, $mail);
-			
-			if($mailok == 1)
-			{
-				if($paswd == $paswd2)	
-				{	
-					$part1 	= hash('md5', $log);
-					$part2 	= hash('gost', $paswd);
-					$salt	= hash('tiger192,4',rand());
-					
-					
-					//Mise en forme du mot de passe
-					$passwd	= $part1.$salt.$part2;
-					
-					if (!preg_match("/^(\+)?\d{10,14}$/", $tel)){
-						$tel = null;
-					}
-
-					$member->update_User($log, $name, $surname, $tel, $email, $passwd);
-											
-					
-					$AddOK = true;
-				} // Fin test des mots de passes
-				
-				else 
-				{
-					echo "Les mots de passes que vous nous avez sp�cifiez, ne 
-					sont pas identique.<a href=\"../index.php?uc=register\"> 
-					Revenir � la page pr�c�dente </a>";
-				} // Fin else mots de passes
-				
-			}// Fin verification si l'utilisateur exist d�j�
-
-			else{
+			$mailoK = preg_match($pattern, $mail);
+		}
+		
+		if($_POST['surname'] == null){
+			$surname = addslashes($_SESSION['PRENOM']);
+		}else{
+			$surname = addslashes($_POST['surname']);
+		}
+		
+		
+		
+		$id = addslashes($_SESSION['USER_ID']);
+		$tel = addslashes($_POST['num']);
+		$member = new MMembers();
+		$log = $member->getLoginById($id);
+		
+		echo $mailoK;
+		if($mailoK == 1){
+			$member->update_User($id, $name, $surname, $tel, $mail);
+			$valid = true;
+		}else{
 				echo "L'adresse mail est invalide";
 			}
-			
-	} // Fin if $_post null
 		
-	else
-	{
-		echo "Veuillez remplir tous les champs obligatoire. 
-		<a href=\"../index.php?uc=user\"> Revenir � la page pr�c�dente </a>"
-		;
-	} // Fin else verif utilisateur
-		
-	if ($AddOK)
-	{
-		session_start();
-		
-		$USR = $member->getUser($log);
-
-		$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
-		$_SESSION["NOM"]		= htmlentities($USR['1']);
-		$_SESSION["PRENOM"]		= htmlentities($USR['2']);
-		$_SESSION["TEL"]		= htmlentities($USR['3']);
-		$_SESSION["EMAIL"]		= htmlentities($USR['4']);
-
-		header("Location: ../index.php?uc=user");
-	} // Fin if AddOK
-
-} // Fin isset $_POST
+		if ($valid)
+		{
+			session_start();
+			$USR = $member->getUser($log[0]);
 	
-	else
-	{
-		echo"(!) FATAL ERROR 1337 (!) <br /> CODE : UUAP88 <br /> Veuillez 
-		contactez l'administrateur du site en lui communiquant le code de 
-		l'erreur : <a href=\"../index.php?uc=register\"> Nous contacter </a>";
-	} // Fin isset $_POST
+			$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+			$_SESSION["NOM"]		= htmlentities($USR['1']);
+			$_SESSION["PRENOM"]		= htmlentities($USR['2']);
+			$_SESSION["TEL"]		= htmlentities($USR['3']);
+			$_SESSION["EMAIL"]		= htmlentities($USR['4']);
+	
+			header("Location: ../index.php?uc=user");
+		} // Fin if AddOK
+	}
+	
+	
+	if (isset($_POST['validMdp'])) {
+		
+		if ( 			
+				$_POST['passwordOld'] 		!= null &&
+				$_POST['password']		!= null &&
+				$_POST['passwordValid'] 	!= null ){
+						
+					$passOld	=   addslashes($_POST['passwordOld']);
+					$paswd	 	= 	addslashes($_POST['password']);
+					$paswd2 	= 	addslashes($_POST['passwordValid']);
+					
+					$member = new MMembers();
+					$log = $member->getLoginById($id);
+					$part1 	= hash('sha1', $paswd);
+					$part2 	= hash('sha1', $paswd2);
+					$verifOldmdp = $member->Get_Info($log);
+					
+					if($passOld == $verifOldmdp[0]){
+						if($paswd == $paswd2)	
+						{	
+							$part1 	= hash('md5', $log[0]);
+							$part2 	= hash('gost', $paswd);
+							$salt	= $log[1];
+							
+							
+							//Mise en forme du mot de passe
+							$mdp	= $part1.$salt.$part2;
+							
+							$member->updateMdp($id, $mdp);
+							$validMdp = true;
+						}else{
+							echo "Erreur dans le nouveau mot de passe n'est pas le même
+							<a href=\"../index.php?uc=user\"> ";
+						}
+					}else{
+						echo "Erreur dans le mot de passe
+						<a href=\"../index.php?uc=user\"> ";
+					}
+					
+				}
+	if ($validMdp)
+		{
+			session_start();
+			$USR = $member->getUser($log[0]);
+	
+			$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+			$_SESSION["NOM"]		= htmlentities($USR['1']);
+			$_SESSION["PRENOM"]		= htmlentities($USR['2']);
+			$_SESSION["TEL"]		= htmlentities($USR['3']);
+			$_SESSION["EMAIL"]		= htmlentities($USR['4']);
+	
+			header("Location: ../index.php?uc=user");
+		} // Fin if AddOK
+	}
 ?>
