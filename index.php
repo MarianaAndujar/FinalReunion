@@ -4,15 +4,16 @@
 	require_once(dirname(__FILE__) . '/config.inc.php');
 
 	// affichage des vues de l'en tete et du sommaire 
-	include(VIEW_DIR . "header.html");	
+	include(VIEW_DIR . "header.php");	
 	include(VIEW_DIR . "menu.php");
 	
 	// instantiation de l'acces aux données
 	require_once(MODEL_DIR . "MMembers.class.php");
 	
 	// utilisation du controleur adapté
-	$page = $_REQUEST["uc"];
-	
+	$page = "";
+	if(isset($_GET['uc']))
+		$page = $_GET['uc'];
 	// Redirection sur le controleur approprié
 	switch($page)
 	{

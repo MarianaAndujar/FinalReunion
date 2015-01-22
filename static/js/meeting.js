@@ -159,6 +159,15 @@ function renderTimelineSelector(parent, datetimes, window_length){
 	});
 }
 
+
+/**
+ * TODO 
+ * @param {Object} meeting_id
+ */
+function getDates(meeting_id){
+	
+}
+
 $(document).ready(renderAdminForm("selector-container", 2));
 
 var dates = [
