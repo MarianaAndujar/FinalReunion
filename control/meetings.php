@@ -61,11 +61,27 @@ class MeetingController extends CoreController{
 			foreach($clean_fields['hours_' . $date_key] as $hour_key=>$hour)
 				MMeeting::addHour($hour, $date_id, $meeting_id);
 		}
+		
+		echo("Meeting successfuly added");
 	}
 	
 	public static function showMeeting($meeting_id){
-		$meeting = MMeeting::getMeetingDatesById($meeting_id);
-		var_dump($meeting);
+		$meeting = MMeeting::getMeetingById($meeting_id);
+		$dates = MMeeting::getMeetingDatesById($meeting_id);
+		require_once(VIEW_DIR . "showmeeting.php");
+		ShowMeetingView::render(array('meeting'=> $meeting, 'dates'=> $dates));
+	}
+	
+	public static function participateToMeeting($meeting_id){
+		$username = isset($_POST['username']) ? $_POST['username'] : null;
+		$uid = isset($_POST['uid'])? $_POST['uid'] : null;
+		
+		if($uid == null && $username == "")
+			die("not logged in and username not set");
+		
+		foreach($_POST['hours'] as $hour_id){
+			MMeeting::addAvailability($meeting_id, null, $hour_id, $username, $uid);
+		}
 	}
 }
 
@@ -87,6 +103,12 @@ switch($action){
 		else
 			echo "id not found";
 		break;
+	case "participate":
+		if(isset($_GET['id']))
+			MeetingController::participateToMeeting(intval($_GET['id']));
+		else
+			echo "id not found";
+		break; 
 	case "list":
 	default:
 		MeetingController::listMeetings();

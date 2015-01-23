@@ -71,6 +71,22 @@ class MMeeting{
 		}
 	}
 	
+	public static function getMeetingParticipatingUIDById($meeting_id){
+		try{
+			$dbh = new db();
+			
+			$stmt = $dbh->prepare("SELECT DISTINCT(`id_user`) FROM `available` 
+									WHERE ID_MEETING = :id");
+			$stmt->bindParam(":id", $meeting_id);
+			
+			$stmt->execute();
+			
+			return $stmt->fetch(PDO::FETCH_ASSOC);
+		}catch(PDOException $e){
+			die($e->getMessage());
+		}
+	}
+	
 	/**
 	 * Récupération d'une réunion à partir de son id
 	 * 
@@ -80,7 +96,7 @@ class MMeeting{
 	 */
 	public static function getMeetingDatesById($meeting_id){
 		try{
-			$dates = [];
+			$dates = array();
 			$dbh = new db();
 			
 			$years_stmt = $dbh->prepare("SELECT DISTINCT year(`dday`)
@@ -93,6 +109,9 @@ class MMeeting{
 			$years = $years_stmt->fetchAll(PDO::FETCH_COLUMN);
 			
 			foreach($years as $year){
+				$year_array = array('year'=> $year,
+					'months' => array());
+					
 				$months_stmt = $dbh->prepare("SELECT DISTINCT month(`dday`)
 										FROM `DATE`
 										WHERE `id_meeting` = :id
@@ -105,6 +124,8 @@ class MMeeting{
 				$months = $months_stmt->fetchAll(PDO::FETCH_COLUMN);
 				
 				foreach($months as $month){
+					$month_array = array('month'=> $month,
+						'days' => array());
 					$days_stmt = $dbh->prepare("SELECT DISTINCT day(`dday`)
 										FROM `DATE`
 										WHERE `id_meeting` = :id
@@ -120,6 +141,9 @@ class MMeeting{
 					$days = $days_stmt->fetchAll(PDO::FETCH_COLUMN);
 					
 					foreach($days as $day){
+						$day_array = array('day'=> $day,
+							'hours' => array());
+							
 						$hours_stmt = $dbh->prepare("SELECT * from `hours` 
 													WHERE `id_date` = 
 														(SELECT `id_date` FROM `DATE` 
@@ -135,10 +159,16 @@ class MMeeting{
 						
 						$hours_stmt->execute();
 						
-						$hours = $hours_stmt->fetchAll();
-						$dates[$year][$month][$day] = $hours;
+						$hours = $hours_stmt->fetchAll(PDO::FETCH_ASSOC);
+						
+						array_push($day_array['hours'], $hours);
+						array_push($month_array['days'], $day_array);
 					}
+					
+					array_push($year_array['months'], $month_array);
 				}
+				
+				array_push($dates, $year_array);
 			}
 			
 			return $dates;
@@ -182,7 +212,7 @@ class MMeeting{
 		$day = format 0000-00-00  
 		$meeting = id_meeting obtenue via getMeetingId()
 	*/
-	public function addDate($day, $meeting)
+	public static function addDate($day, $meeting)
 	{
 		try{
 			// connexion
@@ -207,7 +237,7 @@ class MMeeting{
 	/**
 	 * 
 	 */
-	public function addHour($hour, $date_id, $meeting_id)
+	public static function addHour($hour, $date_id, $meeting_id)
 	{
 		try{
 			// connexion
@@ -227,6 +257,55 @@ class MMeeting{
 			return $hour_id;
 		}catch (PDOException $e){
 			die("exception");
+		}
+	}
+	
+	/**
+	 * 
+	 * TODO nettoyer la bdd avant ajout
+	 */
+	public static function addAvailability($meeting_id, $date_id, $hour_id, $username, $uid){
+		try{
+			if($username == null && uid == null)
+				die("username not set or not logged in");
+			
+			
+			// connexion
+			$dbh = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			/*
+			$stmt = $dbh->prepare("INSERT INTO `project`.`available` 
+				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
+				VALUES (:meeting_id, :date_id, :hour_id, :username, :uid);");
+			 * 
+			 */
+			 
+			 $stmt = $dbh->prepare("INSERT INTO `project`.`available` 
+				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
+				VALUES ( 
+					:meeting_id, 
+					(SELECT `ID_DATE` FROM `hours` WHERE `ID_HOURS` = :hour_id), 
+					:hour_id, 
+					:username, 
+					:uid);");
+				 
+			$stmt->bindParam(":meeting_id", $meeting_id);
+			//$stmt->bindParam(":date_id", $date_id);
+			$stmt->bindParam(":hour_id", $hour_id);
+			$stmt->bindParam(":username", $username);
+			$stmt->bindParam(":uid", $uid);
+			
+			$stmt->execute();
+			
+			// deconnexion
+			$availability_id = $dbh->lastInsertID();
+			$cnx = null;
+			
+			return $availability_id;
+		}catch (PDOException $e){
+			die("exception : " . $e->getMessage());
 		}
 	}
 	
