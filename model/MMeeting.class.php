@@ -2,6 +2,7 @@
 /**
 *	@file   MMeeting.class.php
 * 
+*	@author Jivay Hay
 *	@author Black Butterfly 
 * 
 *	@date   21/01/2015
@@ -72,6 +73,39 @@ class MMeeting{
 	}
 	
 	/**
+	 * Renvoie les participants d'une réunion
+	 * Récupère dans un premier temps les participants connectés, puis les
+	 * non-connectés afin d'éviter les doublons.
+	 * 
+	 * @param int $meeting_id Index de la réunion
+	 * 
+	 * @return array('uids'=>array(), 'unames'=>array()) Tableau de tableaux
+	 */
+	public static function getMeetingParticipants($meeting_id){
+		try{
+			$dbh = new db();
+			
+			$uids_stmt = $dbh->prepare("SELECT DISTINCT(`id_user`) FROM `available` 
+									WHERE ID_MEETING = :id
+									AND `id_user` IS NOT NULL");
+			$uids_stmt->bindParam(":id", $meeting_id);
+			$uids_stmt->execute();
+			$uids =  $uids_stmt->fetchAll(PDO::FETCH_ASSOC);
+			
+			$unames_stmt = $dbh->prepare("SELECT DISTINCT(`owner`) FROM `available` 
+									WHERE `ID_MEETING` = :id
+									AND `ID_USER` IS NULL");
+			$unames_stmt->bindParam(":id", $meeting_id);
+			$unames_stmt->execute();
+			$unames =  $unames_stmt->fetchAll(PDO::FETCH_ASSOC);
+			
+			return array('uids' => $uids, 'unames'=>$unames);
+		}catch(PDOException $e){
+			die($e->getMessage());
+		}
+	}
+	
+	/**
 	 * Récupération d'une réunion à partir de son id
 	 * 
 	 * @param int $meeting_id id de la réunion que l'on souhaite obtenir
@@ -80,7 +114,11 @@ class MMeeting{
 	 */
 	public static function getMeetingDatesById($meeting_id){
 		try{
+<<<<<<< HEAD
 			//$dates = [];
+=======
+			$dates = array();
+>>>>>>> origin/master
 			$dbh = new db();
 			
 			$years_stmt = $dbh->prepare("SELECT DISTINCT year(`dday`)
@@ -93,6 +131,9 @@ class MMeeting{
 			$years = $years_stmt->fetchAll(PDO::FETCH_COLUMN);
 			
 			foreach($years as $year){
+				$year_array = array('year'=> $year,
+					'months' => array());
+					
 				$months_stmt = $dbh->prepare("SELECT DISTINCT month(`dday`)
 										FROM `DATE`
 										WHERE `id_meeting` = :id
@@ -105,6 +146,8 @@ class MMeeting{
 				$months = $months_stmt->fetchAll(PDO::FETCH_COLUMN);
 				
 				foreach($months as $month){
+					$month_array = array('month'=> $month,
+						'days' => array());
 					$days_stmt = $dbh->prepare("SELECT DISTINCT day(`dday`)
 										FROM `DATE`
 										WHERE `id_meeting` = :id
@@ -120,6 +163,9 @@ class MMeeting{
 					$days = $days_stmt->fetchAll(PDO::FETCH_COLUMN);
 					
 					foreach($days as $day){
+						$day_array = array('day'=> $day,
+							'hours' => array());
+							
 						$hours_stmt = $dbh->prepare("SELECT * from `hours` 
 													WHERE `id_date` = 
 														(SELECT `id_date` FROM `DATE` 
@@ -135,10 +181,35 @@ class MMeeting{
 						
 						$hours_stmt->execute();
 						
-						$hours = $hours_stmt->fetchAll();
-						$dates[$year][$month][$day] = $hours;
+						$hours = $hours_stmt->fetchAll(PDO::FETCH_ASSOC);
+						
+						foreach($hours as $hour){
+							$hour_array = array('hour'=> $hour,
+								'availabilities'=>array());
+							
+							$availabilities_stmt = $dbh->prepare("SELECT * 
+								FROM `available` 
+								WHERE `id_meeting` = :meeting_id 
+								AND `id_hours` = :hour_id;");
+							
+							$availabilities_stmt->bindParam(":meeting_id", $meeting_id);
+							$availabilities_stmt->bindParam(":hour_id", $hour['ID_HOURS']);
+							
+							$availabilities_stmt->execute();
+							
+							$availabilities = $availabilities_stmt->fetchAll();
+							
+							array_push($hour_array['availabilities'], $availabilities);
+							array_push($day_array['hours'], $hour_array);
+						}
+						
+						array_push($month_array['days'], $day_array);
 					}
+					
+					array_push($year_array['months'], $month_array);
 				}
+				
+				array_push($dates, $year_array);
 			}
 			
 			return $dates;
@@ -182,7 +253,7 @@ class MMeeting{
 		$day = format 0000-00-00  
 		$meeting = id_meeting obtenue via getMeetingId()
 	*/
-	public function addDate($day, $meeting)
+	public static function addDate($day, $meeting)
 	{
 		try{
 			// connexion
@@ -207,7 +278,7 @@ class MMeeting{
 	/**
 	 * 
 	 */
-	public function addHour($hour, $date_id, $meeting_id)
+	public static function addHour($hour, $date_id, $meeting_id)
 	{
 		try{
 			// connexion
@@ -227,6 +298,70 @@ class MMeeting{
 			return $hour_id;
 		}catch (PDOException $e){
 			die("exception");
+		}
+	}
+	
+	/**
+	 * 
+	 * TODO nettoyer la bdd avant ajout
+	 */
+	public static function addAvailability($meeting_id, $date_id, $hour_id, $username, $uid){
+		try{
+			if($username == null && $uid == null)
+				die("username not set or not logged in");
+			
+			
+			// connexion
+			$dbh = new db();
+			
+			if($username == null){
+				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
+					WHERE `ID_MEETING` = :meeting_id 
+					AND `ID_USER` = :uid");
+				$delete_stmt->bindParam(":meeting_id", $meeting_id);
+				$delete_stmt->bindParam(":uid", $uid);
+			}else{
+				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
+					WHERE `ID_MEETING` = :meeting_id 
+					AND `OWNER` = :username");
+				$delete_stmt->bindParam(":meeting_id", $meeting_id);
+				$delete_stmt->bindParam(":username", $username);
+			}
+			
+			$delete_stmt->execute();
+			
+			// preparer la requete
+			/*
+			$stmt = $dbh->prepare("INSERT INTO `project`.`available` 
+				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
+				VALUES (:meeting_id, :date_id, :hour_id, :username, :uid);");
+			 * 
+			 */
+			 
+			 $stmt = $dbh->prepare("INSERT INTO `project`.`available` 
+				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
+				VALUES ( 
+					:meeting_id, 
+					(SELECT `ID_DATE` FROM `hours` WHERE `ID_HOURS` = :hour_id), 
+					:hour_id, 
+					:username, 
+					:uid);");
+				 
+			$stmt->bindParam(":meeting_id", $meeting_id);
+			//$stmt->bindParam(":date_id", $date_id);
+			$stmt->bindParam(":hour_id", $hour_id);
+			$stmt->bindParam(":username", $username);
+			$stmt->bindParam(":uid", $uid);
+			
+			$stmt->execute();
+			
+			// deconnexion
+			$availability_id = $dbh->lastInsertID();
+			$cnx = null;
+			
+			return $availability_id;
+		}catch (PDOException $e){
+			die("exception : " . $e->getMessage());
 		}
 	}
 	
