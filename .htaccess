@@ -6,7 +6,6 @@ SetEnv dbHost 	"localhost"
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-	RewriteBase /FinalReunion/
 	RewriteRule ^$				home
 	RewriteRule ^([a-z]+)/([a-z]+)/?$	index.php?uc=$1&action=$2 [NC,L]
 	RewriteRule ^([a-z]+)/?$	index.php?uc=$1 [NC,L]

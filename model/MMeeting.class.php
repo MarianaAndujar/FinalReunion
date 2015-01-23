@@ -76,7 +76,7 @@ class MMeeting{
 
 		try{
 			// connexion
-			$dbh = new db();
+			$cnx = new db();
 			
 			// preparer la requete
 			$req = "INSERT INTO MEETING (SUBJECT, DESCRIPTION, LOCATION, 
@@ -86,7 +86,10 @@ class MMeeting{
 				$user));
 			
 			// deconnexion
+			$meeting_id = $cnx->lastInsertID();
 			$cnx = null;
+			
+			return $meeting_id;
 		}catch (PDOException $e){
 			die("exception");
 		}	
@@ -101,17 +104,46 @@ class MMeeting{
 	public function addDate($day, $meeting)
 	{
 		try{
-				// connexion
-				$cnx = new db();
-				//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				
-				// preparer la requete
-				$req = "INSERT INTO DATE (DDAY, ID_MEETING) VALUES (?, ?)";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($day, $meeting));
-				
-				// deconnexion
-				$cnx = null;
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "INSERT INTO DATE (DDAY, ID_MEETING) VALUES (?, ?)";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($day, $meeting));
+			
+			// deconnexion
+			$date_id = $cnx->lastInsertID();
+			$cnx = null;
+			
+			return $date_id;
+		}catch (PDOException $e){
+			die("exception");
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public function addHour($hour, $date_id, $meeting_id)
+	{
+		try{
+			// connexion
+			$cnx = new db();
+			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			// preparer la requete
+			$req = "INSERT INTO HOURS (BHOUR, ID_MEETING, ID_DATE) 
+				VALUES (?, ?, ?)";
+			$reqprep = $cnx->prepare($req);
+			$reqprep->execute(array($hour, $meeting_id, $date_id));
+			
+			// deconnexion
+			$hour_id = $cnx->lastInsertID();
+			$cnx = null;
+			
+			return $hour_id;
 		}catch (PDOException $e){
 			die("exception");
 		}

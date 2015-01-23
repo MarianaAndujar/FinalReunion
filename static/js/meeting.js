@@ -32,14 +32,14 @@ function renderTimelineHoursAdminSelector(parent, window_length, origin_date){
 		selector_inputs_row.appendChild(selector_input_cell);
 		var selector_input = document.createElement("input");
 		selector_input.setAttribute("type", "checkbox");
-		selector_input.setAttribute("name", "hours_"+id_prefix);
+		selector_input.setAttribute("name", "hours_"+id_prefix+"[]");
 		selector_input.setAttribute("value", i);
 		selector_input.setAttribute("id", id_prefix+"_hour_"+i);
 		selector_input_cell.appendChild(selector_input);
 	}
 	
 	var date_input = document.createElement("input");
-	$(date_input).datepicker({ dateFormat: 'dd-mm-yy' });
+	$(date_input).datepicker({ dateFormat: 'yy-mm-dd' });
 	date_input.setAttribute("name", date_input.id);
 	parent.insertBefore(date_input, ref_elem);
 	
@@ -74,10 +74,17 @@ function renderAdminForm(parent_id, window_length){
 	
 	var meeting_desc_input = document.createElement("input");
 	meeting_desc_input.setAttribute("type", "text");
-	meeting_desc_input.setAttribute("type", "meeting_description");
+	meeting_desc_input.setAttribute("name", "meeting_description");
 	form.appendChild(meeting_desc_input);
 	
+	var meeting_location_input = document.createElement("input");
+	meeting_location_input.setAttribute("type", "text");
+	meeting_location_input.setAttribute("name", "meeting_location");
+	form.appendChild(meeting_location_input);
+	
 	var window_length_input = document.createElement("input");
+	window_length_input.setAttribute("type", "number");
+	window_length_input.setAttribute("name", "meeting_duration");
 	window_length_input.setAttribute("value", window_length);
 	var window_length_button = document.createElement("button");
 	window_length_button.setAttribute("type", "button");
@@ -93,7 +100,7 @@ function renderAdminForm(parent_id, window_length){
 	form.appendChild(document.createElement("br"));
 	
 	var date_input = document.createElement("input");
-	$(date_input).datepicker({ dateFormat: 'dd-mm-yy' });
+	$(date_input).datepicker({ dateFormat: 'yy-mm-dd' });
 	date_input.setAttribute("name", date_input.id);
 	form.appendChild(date_input);
 	
