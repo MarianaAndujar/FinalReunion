@@ -24,7 +24,12 @@ class MMeeting{
 	
 	
 	/**
+	 * Récupération d'une liste de réunions
 	 * 
+	 * @param int $offset Index de début de la liste
+	 * @param int $limit Taille de la liste
+	 * 
+	 * @return mixed[] Renvoie une liste associative de réunions
 	 */
 	public static function getMeetings($offset=0, $limit=20){
 		try{
@@ -56,11 +61,87 @@ class MMeeting{
 			
 			$stmt = $dbh->prepare("SELECT * FROM MEETING 
 									WHERE ID_MEETING = :id");
-			$stmt.bindParam(":id", $meeting_id);
+			$stmt->bindParam(":id", $meeting_id);
 			
-			$stmt.execute();
+			$stmt->execute();
 			
 			return $stmt->fetch(PDO::FETCH_ASSOC);
+		}catch(PDOException $e){
+			die($e->getMessage());
+		}
+	}
+	
+	/**
+	 * Récupération d'une réunion à partir de son id
+	 * 
+	 * @param int $meeting_id id de la réunion que l'on souhaite obtenir
+	 * 
+	 * @return mixed[] Renvoie la réunion comme un tableau associatif
+	 */
+	public static function getMeetingDatesById($meeting_id){
+		try{
+			$dates = [];
+			$dbh = new db();
+			
+			$years_stmt = $dbh->prepare("SELECT DISTINCT year(`dday`)
+									FROM `DATE`
+									WHERE `id_meeting` = :id;");
+			$years_stmt->bindParam(":id", $meeting_id);
+			
+			$years_stmt->execute();
+			
+			$years = $years_stmt->fetchAll(PDO::FETCH_COLUMN);
+			
+			foreach($years as $year){
+				$months_stmt = $dbh->prepare("SELECT DISTINCT month(`dday`)
+										FROM `DATE`
+										WHERE `id_meeting` = :id
+										AND year(`dday`) = :year;");
+				$months_stmt->bindParam(":id", $meeting_id);
+				$months_stmt->bindParam(":year", $year);
+				
+				$months_stmt->execute();
+				
+				$months = $months_stmt->fetchAll(PDO::FETCH_COLUMN);
+				
+				foreach($months as $month){
+					$days_stmt = $dbh->prepare("SELECT DISTINCT day(`dday`)
+										FROM `DATE`
+										WHERE `id_meeting` = :id
+										AND year(`dday`) = :year
+										AND month(`dday`) = :month;");
+										
+					$days_stmt->bindParam(":id", $meeting_id);
+					$days_stmt->bindParam(":year", $year);
+					$days_stmt->bindParam(":month", $month);
+					
+					$days_stmt->execute();
+					
+					$days = $days_stmt->fetchAll(PDO::FETCH_COLUMN);
+					
+					foreach($days as $day){
+						$hours_stmt = $dbh->prepare("SELECT * from `hours` 
+													WHERE `id_date` = 
+														(SELECT `id_date` FROM `DATE` 
+															WHERE `id_meeting` = :id 
+															AND year(`dday`) = :year	
+															AND month(`dday`) = :month 
+															AND day(`dday`) = :day);");
+						
+						$hours_stmt->bindParam(":id", $meeting_id);
+						$hours_stmt->bindParam(":year", $year);
+						$hours_stmt->bindParam(":month", $month);
+						$hours_stmt->bindParam(":day", $day);
+						
+						$hours_stmt->execute();
+						
+						$hours = $hours_stmt->fetchAll();
+						$dates[$year][$month][$day] = $hours;
+					}
+				}
+			}
+			
+			return $dates;
 		}catch(PDOException $e){
 			die($e->getMessage());
 		}
@@ -170,49 +251,4 @@ class MMeeting{
 		}	
 		return $result;
 	}
-	
-	// TODO
-	/*
-	public function update_User($login, $name, $surname, $tel, $email, $passwd){
-		try{
-				// connexion
-				$cnx = new db()
-				$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				
-				// preparer la requete
-				$req = "UPDATE USER SET NAME = '$name', SURNAME = '$surname', 
-						TEL = '$tel', EMAIL = '$email', PASSWD = '$passwd' 
-						WHERE LOGIN ='$login';";
-				$reqprep = $cnx->prepare($req);
-				$reqprep->execute(array($login));
-				
-				// deconnexion
-				$cnx = null;
-		}catch (PDOException $e){
-			die("exception : ". $e->getMessage());
-		}
-		
-	}
-	
-	public function getUser($login)
-	{
-		try{
-			// connexion
-			$cnx = new db();
-			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			
-			// preparer la requete
-			$req = "SELECT ID_USER, NAME, SURNAME, TEL, EMAIL FROM USER 
-				WHERE LOGIN = ?;";
-			$reqprep = $cnx->prepare($req);
-			$reqprep->execute(array($login));
-			$result = $reqprep->fetch();
-			
-			// deconnexion
-			$cnx = null;
-		}catch (PDOException $e){
-			die("exception : ". $e->getMessage());
-		}	
-		return $result;
-	}*/
 }

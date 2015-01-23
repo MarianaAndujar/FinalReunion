@@ -63,7 +63,10 @@ class MeetingController extends CoreController{
 		}
 	}
 	
-	public static function showMeeting(){}
+	public static function showMeeting($meeting_id){
+		$meeting = MMeeting::getMeetingDatesById($meeting_id);
+		var_dump($meeting);
+	}
 }
 
 if(isset($_GET['action']))
@@ -77,6 +80,12 @@ switch($action){
 		break;
 	case "create":
 		MeetingController::createMeeting();
+		break;
+	case "show":
+		if(isset($_GET['id']))
+			MeetingController::showMeeting(intval($_GET['id']));
+		else
+			echo "id not found";
 		break;
 	case "list":
 	default:
