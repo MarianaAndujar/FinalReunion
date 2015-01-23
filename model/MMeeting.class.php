@@ -2,6 +2,7 @@
 /**
 *	@file   MMeeting.class.php
 * 
+*	@author Jivay Hay
 *	@author Black Butterfly 
 * 
 *	@date   21/01/2015
@@ -71,17 +72,34 @@ class MMeeting{
 		}
 	}
 	
-	public static function getMeetingParticipatingUIDById($meeting_id){
+	/**
+	 * Renvoie les participants d'une réunion
+	 * Récupère dans un premier temps les participants connectés, puis les
+	 * non-connectés afin d'éviter les doublons.
+	 * 
+	 * @param int $meeting_id Index de la réunion
+	 * 
+	 * @return array('uids'=>array(), 'unames'=>array()) Tableau de tableaux
+	 */
+	public static function getMeetingParticipants($meeting_id){
 		try{
 			$dbh = new db();
 			
-			$stmt = $dbh->prepare("SELECT DISTINCT(`id_user`) FROM `available` 
-									WHERE ID_MEETING = :id");
-			$stmt->bindParam(":id", $meeting_id);
+			$uids_stmt = $dbh->prepare("SELECT DISTINCT(`id_user`) FROM `available` 
+									WHERE ID_MEETING = :id
+									AND `id_user` IS NOT NULL");
+			$uids_stmt->bindParam(":id", $meeting_id);
+			$uids_stmt->execute();
+			$uids =  $uids_stmt->fetchAll(PDO::FETCH_ASSOC);
 			
-			$stmt->execute();
+			$unames_stmt = $dbh->prepare("SELECT DISTINCT(`owner`) FROM `available` 
+									WHERE `ID_MEETING` = :id
+									AND `ID_USER` IS NULL");
+			$unames_stmt->bindParam(":id", $meeting_id);
+			$unames_stmt->execute();
+			$unames =  $unames_stmt->fetchAll(PDO::FETCH_ASSOC);
 			
-			return $stmt->fetch(PDO::FETCH_ASSOC);
+			return array('uids' => $uids, 'unames'=>$unames);
 		}catch(PDOException $e){
 			die($e->getMessage());
 		}
@@ -161,7 +179,26 @@ class MMeeting{
 						
 						$hours = $hours_stmt->fetchAll(PDO::FETCH_ASSOC);
 						
-						array_push($day_array['hours'], $hours);
+						foreach($hours as $hour){
+							$hour_array = array('hour'=> $hour,
+								'availabilities'=>array());
+							
+							$availabilities_stmt = $dbh->prepare("SELECT * 
+								FROM `available` 
+								WHERE `id_meeting` = :meeting_id 
+								AND `id_hours` = :hour_id;");
+							
+							$availabilities_stmt->bindParam(":meeting_id", $meeting_id);
+							$availabilities_stmt->bindParam(":hour_id", $hour['ID_HOURS']);
+							
+							$availabilities_stmt->execute();
+							
+							$availabilities = $availabilities_stmt->fetchAll();
+							
+							array_push($hour_array['availabilities'], $availabilities);
+							array_push($day_array['hours'], $hour_array);
+						}
+						
 						array_push($month_array['days'], $day_array);
 					}
 					
@@ -266,13 +303,28 @@ class MMeeting{
 	 */
 	public static function addAvailability($meeting_id, $date_id, $hour_id, $username, $uid){
 		try{
-			if($username == null && uid == null)
+			if($username == null && $uid == null)
 				die("username not set or not logged in");
 			
 			
 			// connexion
 			$dbh = new db();
-			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			
+			if($username == null){
+				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
+					WHERE `ID_MEETING` = :meeting_id 
+					AND `ID_USER` = :uid");
+				$delete_stmt->bindParam(":meeting_id", $meeting_id);
+				$delete_stmt->bindParam(":uid", $uid);
+			}else{
+				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
+					WHERE `ID_MEETING` = :meeting_id 
+					AND `OWNER` = :username");
+				$delete_stmt->bindParam(":meeting_id", $meeting_id);
+				$delete_stmt->bindParam(":username", $username);
+			}
+			
+			$delete_stmt->execute();
 			
 			// preparer la requete
 			/*

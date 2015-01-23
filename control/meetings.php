@@ -65,13 +65,21 @@ class MeetingController extends CoreController{
 		echo("Meeting successfuly added");
 	}
 	
+	/**
+	 * 
+	 */
 	public static function showMeeting($meeting_id){
 		$meeting = MMeeting::getMeetingById($meeting_id);
+		$participants = MMeeting::getMeetingParticipants($meeting_id);
 		$dates = MMeeting::getMeetingDatesById($meeting_id);
 		require_once(VIEW_DIR . "showmeeting.php");
-		ShowMeetingView::render(array('meeting'=> $meeting, 'dates'=> $dates));
+		ShowMeetingView::render(array('meeting'=> $meeting, 
+			'participants'=>$participants, 'dates'=> $dates));
 	}
 	
+	/**
+	 * 
+	 */
 	public static function participateToMeeting($meeting_id){
 		$username = isset($_POST['username']) ? $_POST['username'] : null;
 		$uid = isset($_POST['uid'])? $_POST['uid'] : null;
