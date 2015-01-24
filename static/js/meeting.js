@@ -77,11 +77,6 @@ function renderAdminForm(parent_id, window_length){
 	meeting_desc_input.setAttribute("name", "meeting_description");
 	form.appendChild(meeting_desc_input);
 	
-	var meeting_location_input = document.createElement("input");
-	meeting_location_input.setAttribute("type", "text");
-	meeting_location_input.setAttribute("name", "meeting_location");
-	form.appendChild(meeting_location_input);
-	
 	var window_length_input = document.createElement("input");
 	window_length_input.setAttribute("type", "number");
 	window_length_input.setAttribute("name", "meeting_duration");

@@ -7,7 +7,7 @@
 * 
 *	@date   21/01/2015
 * 
-*	@brief  Ici se trouve la class gerant les actions sur les meetings
+*	@brief  Classe gérant les réunions et les actions liées aux réunions
 **/
 
 require_once(dirname(__FILE__) . "/../config.inc.php");
@@ -49,6 +49,17 @@ class MMeeting{
 		}
 	}
     
+    
+    /**
+     * Récupération des réunions créées par un utilisateur ou auxquelles il
+     * participe, si elles sont disponibles.
+     * Deux tableaux sont renvoyés dans un seul : les réunions créées, et
+     * celles auxquelles l'utilisateur participe, avec doublons entre les deux.
+     * 
+     * @param int $uid UID de l'utilisateur
+     * 
+     * @return array(array(), array()) Tableau associatif de tableaux
+     */
     public static function getMeetingsByUID($uid){
         try{
             $dbh = new db();
@@ -100,6 +111,17 @@ class MMeeting{
 	}
     
     
+    /**
+     * Nombre maximum de participants à un horaire pour une réunion
+     * Permet de connaître le nombre maximum de participants pouvant être
+     * attendus à une réunion, parmi tous les horaires disponibles.
+     * 
+     * La réunion doit exister.
+     * 
+     * @param int $meeting_id id de la réunion
+     * 
+     * @return int
+     */
     public static function getMeetingMaxParticipation($meeting_id){
         try{
             $dbh = new db();
@@ -155,7 +177,10 @@ class MMeeting{
 	}
 	
 	/**
-	 * Récupération d'une réunion à partir de son id
+	 * Récupération d'une réunion et des dates et horaires à partir de son id
+     * Les dates et heures sont agencées dans des arbres dont la racine est
+     * une année, et les feuilles les horaires, qui connaissent pour chacune
+     * les utilisateurs ayant répondu présent.
 	 * 
 	 * @param int $meeting_id id de la réunion que l'on souhaite obtenir
 	 * 
@@ -268,23 +293,28 @@ class MMeeting{
 	}
 	
 	/**
-	 * Ajout d'un meeting
+	 * Ajout d'une réunion
 	 * 
+     * @param String $subject Sujet de la réunion
+     * @param String $description Description de la réunion
+     * @param int $duration Durée des créneaux horaires en heures
+     * @param int $uid UID de l'utilisateur créateur de la réunion
+     * 
+     * @return int Renvoie l'id de la réunion nouvellement créée.
+     * 
 	 */
-    public static function addMeeting ($subject, $description, $locate, 
-    	$duration, $user)
-    {
-
+    public static function addMeeting($subject, $description, $duration, $uid){
 		try{
 			// connexion
 			$cnx = new db();
 			
 			// preparer la requete
-			$req = "INSERT INTO MEETING (SUBJECT, DESCRIPTION, LOCATION, 
-				DURATION, ID_USER) VALUES (?, ?, ?, ?, ?)";
+			$req = "INSERT INTO MEETING 
+			     (SUBJECT, DESCRIPTION, DURATION, ID_USER) 
+			     VALUES (?, ?, ?, ?)";
 			$reqprep = $cnx->prepare($req);
-			$reqprep->execute(array($subject, $description, $locate, $duration, 
-				$user));
+			$reqprep->execute(array($subject, $description, $duration, 
+				$uid));
 			
 			// deconnexion
 			$meeting_id = $cnx->lastInsertID();
@@ -295,8 +325,14 @@ class MMeeting{
 			die("exception");
 		}	
     }
+
     
-    
+    /**
+     * Clôture un sondage de réunion
+     * Les utilisateurs ne pourront plus proposer leurs disponibilités.
+     * 
+     * @param int $meeting_id id de la réunion à clôturer
+     */
     public static function closeMeeting ($meeting_id){
         try{
             // connexion
@@ -315,7 +351,13 @@ class MMeeting{
             die("exception");
         }   
     }
+
     
+    /**
+     * Ouvre un sondage de réunion
+     * 
+     * @param int $meeting_id id de la réunion à ouvrir
+     */
     public static function openMeeting ($meeting_id){
         try{
             // connexion
@@ -335,18 +377,18 @@ class MMeeting{
         }   
     }
 	
-	/*
-		Ajout d'une date d'un meeting
-		
-		$day = format 0000-00-00  
-		$meeting = id_meeting obtenue via getMeetingId()
-	*/
+	
+	/**
+     * Ajoute une proposition de date à une réunion
+     * 
+     * @param String $date date à ajouter au format yyyy-mm-dd
+     * @param int $meeting_id id de la réunion à laquelle ajouter la date
+     */
 	public static function addDate($day, $meeting)
 	{
 		try{
 			// connexion
 			$cnx = new db();
-			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
 			// preparer la requete
 			$req = "INSERT INTO DATE (DDAY, ID_MEETING) VALUES (?, ?)";
@@ -364,14 +406,19 @@ class MMeeting{
 	}
 	
 	/**
-	 * 
+	 * Ajoute une proposition d'heure à une date pour une réunion
+     * 
+     * @param int $hour heure entière de début
+     * @param int $date_id id de la date à laquelle ajouter l'heure
+     * @param int $meeting_id id de la réunion
 	 */
-	public static function addHour($hour, $date_id, $meeting_id)
-	{
+	public static function addHour($hour, $date_id, $meeting_id){
+	    if($hour < 0 || $hour > 24)
+            die("exception");
+        
 		try{
 			// connexion
 			$cnx = new db();
-			//$cnx->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			
 			// preparer la requete
 			$req = "INSERT INTO HOURS (BHOUR, ID_MEETING, ID_DATE) 
@@ -390,8 +437,16 @@ class MMeeting{
 	}
 	
 	/**
-	 * 
-	 * TODO nettoyer la bdd avant ajout
+	 * Ajoute une disponibilité pour un utilisateur à une réunion à une date
+     * et une heure.
+     * Ne supprime pas les précédentes disponibilités enregistrées.
+     * Voir MMeeting::deleteAvailabilities pour supprimer les disponibilités.
+     * 
+     * @param int $meeting_id id de la réunion
+	 * @param int $date_id id de la date
+     * @param int $hour_id id de l'heure
+     * @param String username nom de l'utilisateur non-enregistré
+     * @param int $uid UID de l'utilisateur enregistré
 	 */
 	public static function addAvailability($meeting_id, $date_id, $hour_id, $username, $uid){
 		try{
@@ -401,14 +456,6 @@ class MMeeting{
 			
 			// connexion
 			$dbh = new db();
-			
-			// preparer la requete
-			/*
-			$stmt = $dbh->prepare("INSERT INTO `project`.`available` 
-				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
-				VALUES (:meeting_id, :date_id, :hour_id, :username, :uid);");
-			 * 
-			 */
 			 
 			 $stmt = $dbh->prepare("INSERT INTO `project`.`available` 
 				(`ID_MEETING`, `ID_DATE`, `ID_HOURS`, `OWNER`, `ID_USER`) 
@@ -436,7 +483,16 @@ class MMeeting{
 			die("exception : " . $e->getMessage());
 		}
 	}
-
+    
+    
+    /**
+     * Supprime les disponibilités d'un utilisateur pour une réunion.
+     * Des disponibilités supplémentaires pourront etre ajoutées par la suite
+     * 
+     * @param int $meeting_id id de la réunion
+     * @param String $username nom d'utilisateur non-enregistré
+     * @param int $uid UID de l'utilisateur enregistré
+     */
     public static function deleteAvailabilities($meeting_id, $username, $uid){
         try{
             if($username == null && $uid == null)
@@ -464,7 +520,15 @@ class MMeeting{
         }
     }
 	
-	public static function getMeetingId($subject, $user)
+    /**
+     * Renvoie un id de réunion en fonction de son nom et de son créateur
+     * 
+     * @param String $subject nom de la réunion
+     * @param int $uid UID de l'utilisateur créateur de la réunion
+     * 
+     * @return array() Renvoie la réunion si elle est trouvée, sinon false.
+     */
+	public static function getMeetingId($subject, $uid)
 	{
 		try{
 			// connexion
@@ -475,7 +539,7 @@ class MMeeting{
 			$req = "SELECT ID_MEETING FROM MEETING 
 					WHERE SUBJECT = ? AND ID_USER = ?;";
 			$reqprep = $cnx->prepare($req);
-			$reqprep->execute(array($subject, $user));
+			$reqprep->execute(array($subject, $uid));
 			$result = $reqprep->fetch();
 			
 			// deconnexion

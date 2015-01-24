@@ -28,7 +28,6 @@ class MeetingController extends CoreController{
 		if(!isset($_SESSION['USER_ID'])
 			|| !isset($_POST['meeting_name']) 
 			|| !isset($_POST['meeting_description'])
-			|| !isset($_POST['meeting_location'])
 			|| !isset($_POST['meeting_duration'])){
 				//TODO raise exception
 				echo "fail'd validation";
@@ -36,7 +35,6 @@ class MeetingController extends CoreController{
 			}
 		$meeting_name = $_POST['meeting_name'];
 		$meeting_desc = $_POST['meeting_description'];
-		$meeting_location = $_POST['meeting_location'];
 		$meeting_duration = $_POST['meeting_duration'];
 		
 		//remove the fields where the date is not set.
@@ -52,7 +50,7 @@ class MeetingController extends CoreController{
 			array_flip($dates_fields_keys));
 		
 		$meeting_id = MMeeting::addMeeting($meeting_name, $meeting_desc, 
-			$meeting_location, $meeting_duration, $_SESSION['USER_ID']);
+            $meeting_duration, $_SESSION['USER_ID']);
 			
 		foreach($dates_fields as $date_key => $date_value){
 			if(!isset($clean_fields['hours_' . $date_key])){
