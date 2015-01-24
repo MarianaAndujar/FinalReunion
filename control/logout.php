@@ -5,7 +5,6 @@
 *	@author Black Butterfly
 * 
 *	@date   21/01/2015 
-* 
 *
 *	@brief  Fichier de déconnexion
 *
@@ -18,5 +17,5 @@
 	// On envoie un cookie de deconnexion
 	setcookie(session_name(), '', time()-3600);
 	// Redirection sur l'acceuil
-	header("Location: ../index.php?uc=home");
+	header("Location: index.php?uc=home");
 ?>

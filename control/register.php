@@ -1,4 +1,5 @@
 <?php
+
 /**
 *	@file   register.php
 * 
@@ -11,19 +12,22 @@
 *
 **/
 
-include ("../model/MMembers.class.php");
-// Création d'un nouvel utilisateur 
+	// Pour accéder au fonctions reliant à la base de donnée
+	include ("../model/MMembers.class.php");
+
+	// Création d'un nouvel utilisateur 
 	$AddOK = false;
-	//echo'<pre>';print_r($_POST);echo'</pre>';
-	if (isset($_POST['Add'])) 
-	{
+	
+	// On regarde si on ressoit bien les données venant du formulaire
+	if (isset($_POST['Add'])) {
+		// On regarde si les champs obligatoires sont bien présent
 		if ( 	$_POST['login'] 	!= null &&
 				$_POST['name'] 		!= null && 
 				$_POST['surname'] 	!= null &&					
 				$_POST['email'] 	!= null &&
 				$_POST['paswd'] 	!= null &&
-				$_POST['paswd2'])
-		{
+				$_POST['paswd2']){
+				
 			// Protéction XSS
 			$log 		= 	addslashes($_POST['login']);
 			$name 		= 	addslashes($_POST['name']);
@@ -34,18 +38,28 @@ include ("../model/MMembers.class.php");
 			$tel 		= 	addslashes($_POST['tel']);
 
 			$member = new MMembers();
+			
+			// On regarde si l'utilisateur existe déjà
 			$exist = $member->Who_I_Am($log);
+			
+			// On hash le mdp de façons à comparer ceux-ci
 			$part1 	= hash('sha1', $paswd);
 			$part2 	= hash('sha1', $paswd2);
 			
+			// Génération d'une regex pour être certain de l'adress mail envoyé
 			$pattern = "/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/";
 			
+			// Return 0 si ça correspond pas
+			// Return 1 si ça correspond
 			$mailok = preg_match($pattern, $mail);
 			
-			if($exist == false && $mailok == 1)
-			{
-				if($paswd == $paswd2)	
-				{	
+			// Si l'utilisateur n'existe pas encore ou que l'adresse mail est 
+			// valide
+			if($exist == false && $mailok == 1){
+			
+				// On hash le mdp via différent algo et on créer un salt en 
+				// random
+				if($paswd == $paswd2)	{	
 					$part1 	= hash('md5', $log);
 					$part2 	= hash('gost', $paswd);
 					$salt	= hash('tiger192,4',rand());
@@ -54,10 +68,14 @@ include ("../model/MMembers.class.php");
 					//Mise en forme du mot de passe
 					$passwd	= $part1.$salt.$part2;
 					
+					// On regarde si le numéro de telephone entré correspond 
+					// à une chaine valide
 					if (!preg_match("/^(\+)?\d{10,14}$/", $tel)){
 						$tel = null;
 					}
 
+					// Ajout de l'utilisateur
+					// !!! ATTENTION SQLI PROBLEME !!!
 					$member->Add_Member($log,
 										$name,
 										$surname,
@@ -69,8 +87,7 @@ include ("../model/MMembers.class.php");
 					$AddOK = true;
 				} // Fin test des mots de passes
 				
-				else 
-				{
+				else {
 					echo "Les mots de passes que vous nous avez spécifiez, ne 
 					sont pas identique.<a href=\"../index.php?uc=register\"> 
 					Revenir à la page précédente </a>";
@@ -79,39 +96,43 @@ include ("../model/MMembers.class.php");
 			}// Fin verification si l'utilisateur exist déjà
 
 			else{
-				echo "Le nom d'utilisateur ou l'adresse mail est invalide";
-			}
+				echo "Le nom d'utilisateur ou l'adresse mail est invalide.
+					  <a href=\"../index.php?uc=register\"> 
+					  Revenir à la page précédente </a>";
+			}// else utilisateur existe ou mail incorect
 			
-	} // Fin if $_post null
+		} // Fin if $_post null
 		
-	else
-	{
-		echo "Veuillez remplir tous les champs obligatoire. 
-		<a href=\"../index.php?uc=register\"> Revenir à la page précédente </a>"
-		;
-	} // Fin else verif utilisateur
+		else{
+			echo "Veuillez remplir tous les champs obligatoire. 
+			<a href=\"../index.php?uc=register\"> Revenir à la page précédente 
+			</a>";
+		} // Fin else verif utilisateur
 		
-	if ($AddOK)
-	{
-		session_start();
-		
-		$USR = $member->getUser($log);
+		// Si tous c'est bien passé
+		if ($AddOK){
+			// On redémare une session ici donc le jeton se régénère
+			session_start();
+			
+			// On récupère les informations dans la bdd
+			$USR = $member->getUser($log);
 
-		$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
-		$_SESSION["NOM"]		= htmlentities($USR['1']);
-		$_SESSION["PRENOM"]		= htmlentities($USR['2']);
-		$_SESSION["TEL"]		= htmlentities($USR['3']);
-		$_SESSION["EMAIL"]		= htmlentities($USR['4']);
+			// Set up des variables de session
+			$_SESSION["USER_ID"] 	= htmlentities($USR['0']);
+			$_SESSION["NOM"]		= htmlentities($USR['1']);
+			$_SESSION["PRENOM"]		= htmlentities($USR['2']);
+			$_SESSION["TEL"]		= htmlentities($USR['3']);
+			$_SESSION["EMAIL"]		= htmlentities($USR['4']);
 
-		header("Location: ../index.php?uc=home");
-	} // Fin if AddOK
+			// Redirection sur home
+			header("Location: ../index.php?uc=home");
+		} // Fin if AddOK
 
-} // Fin isset $_POST
+	} // Fin isset $_POST
 	
 	else
 	{
-		echo"(!) FATAL ERROR 1337 (!) <br /> CODE : UUAP88 <br /> Veuillez 
-		contactez l'administrateur du site en lui communiquant le code de 
-		l'erreur : <a href=\"../index.php?uc=register\"> Nous contacter </a>";
+		// ON N'EST PAS SENSE ARRIVE ICI
+		echo"(!) FATAL ERROR 1337 (!) ";
 	} // Fin isset $_POST
 ?>
