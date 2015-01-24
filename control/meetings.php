@@ -10,7 +10,12 @@ require_once(MODEL_DIR . '/MMeeting.class.php');
  * 
  */
 class MeetingController extends CoreController{
-	public static function listMeetings($offset=0, $limit=20){}
+	public static function listMeetings(){
+	    if(isset($_SESSION['USER_ID'])){
+	        require_once(VIEW_DIR . "listmeetings.php");
+	        ListMeetingsView::render(array('meetings' =>MMeeting::getMeetingsByUID($_SESSION['USER_ID'])));
+	    }
+	}
 	
 	public static function newMeeting(){
 		include(VIEW_DIR . "newmeeting.php");
@@ -72,14 +77,19 @@ class MeetingController extends CoreController{
 		$meeting = MMeeting::getMeetingById($meeting_id);
         
         if($meeting){
-            $participants = MMeeting::getMeetingParticipants($meeting_id);
-            $dates = MMeeting::getMeetingDatesById($meeting_id);
-            $max_participation = MMeeting::getMeetingMaxParticipation($meeting_id);
-            require_once(VIEW_DIR . "showmeeting.php");
-            ShowMeetingView::render(array('meeting'=> $meeting, 
-		      'participants'=>$participants, 'dates'=> $dates, 
-		      'max_participation'=>$max_participation));
-              
+            if($meeting['OPEN'] || 
+                (isset($_SESSION['USER_ID']) && $meeting['ID_USER'] == $_SESSION['USER_ID'])){
+                $participants = MMeeting::getMeetingParticipants($meeting_id);
+                $dates = MMeeting::getMeetingDatesById($meeting_id);
+                $max_participation = MMeeting::getMeetingMaxParticipation($meeting_id);
+                require_once(VIEW_DIR . "showmeeting.php");
+                ShowMeetingView::render(array('meeting'=> $meeting, 
+    		      'participants'=>$participants, 'dates'=> $dates, 
+    		      'max_participation'=>$max_participation));
+            }else{
+                header("HTTP/1.1 404 Not found");
+                echo "no such meeting";
+            }
         }else{
             header("HTTP/1.1 404 Not found");
             echo "no such meeting";
@@ -102,6 +112,30 @@ class MeetingController extends CoreController{
     			MMeeting::addAvailability($meeting_id, null, $hour_id, $username, $uid);
 		
 	}
+    
+    public static function openMeeting($meeting_id){
+        if(isset($_SESSION['USER_ID'])){
+            $meeting = MMeeting::getMeetingById($meeting_id);
+            if($meeting['ID_USER'] == $_SESSION['USER_ID'])
+                MMeeting::openMeeting($meeting_id);
+            else
+                die("403");
+        }else{
+            die("403");
+        }
+    }
+    
+    public static function closeMeeting($meeting_id){
+        if(isset($_SESSION['USER_ID'])){
+            $meeting = MMeeting::getMeetingById($meeting_id);
+            if($meeting['ID_USER'] == $_SESSION['USER_ID'])
+                MMeeting::closeMeeting($meeting_id);
+            else
+                die("403");
+        }else{
+            die("403");
+        }
+    }
 }
 
 if(isset($_GET['action']))
@@ -128,6 +162,18 @@ switch($action){
 		else
 			echo "id not found";
 		break; 
+    case "open":
+        if(isset($_GET['id']))
+            MeetingController::openMeeting(intval($_GET['id']));
+        else
+            echo "id not found";
+        break;
+    case "close":
+        if(isset($_GET['id']))
+            MeetingController::closeMeeting(intval($_GET['id']));
+        else
+            echo "id not found";
+        break;
 	case "list":
 	default:
 		MeetingController::listMeetings();

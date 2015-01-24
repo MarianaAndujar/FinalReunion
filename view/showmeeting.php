@@ -10,7 +10,11 @@ class ShowMeetingView{
     <div class="container">
     	<h1>Participer</h1>
     	   <?php if (isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $values['meeting']['ID_USER']): ?>
-			   <a href="<?php echo BASE_URI .'/meetings/edit/'. $values['meeting']['ID_MEETING'];?>">Editer</a>
+    	       <?php if ($values['meeting']['OPEN']): ?>
+				   <a href="<?php echo BASE_URI .'/meetings/close/'. $values['meeting']['ID_MEETING'];?>">Fermer</a>
+			   <?php else: ?>
+				   <a href="<?php echo BASE_URI .'/meetings/open/'. $values['meeting']['ID_MEETING'];?>">Ouvrir</a>
+			   <?php endif ?>
 			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/xls';?>">Exporter (XLS)</a>
 			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/pdf';?>">Exporter (PDF)</a>
 		   <?php endif ?>
@@ -103,7 +107,7 @@ class ShowMeetingView{
 									continue;?>
 						<tr class="timeline-input">
 							<th class="timeline-non-header">
-								<div><?php echo MMembers::getLoginById($participant['id_user'])[0];?></div>
+								<div><?php echo MMembers::getUsernameById($participant['id_user']);?></div>
 							</th>
 							<?php 
 							foreach($values['dates'] as $year){
@@ -167,7 +171,7 @@ class ShowMeetingView{
 								<th class="timeline-non-header">
 									<div><?php 
 									if(isset($_SESSION['USER_ID'])){
-										echo MMembers::getLoginById($_SESSION['USER_ID'])[0];
+										echo MMembers::getUsernameById($_SESSION['USER_ID']);
 										?><input type="hidden" name="uid" value="<?php echo $_SESSION['USER_ID'];?>" />
 									<?php }else{ ?>
 										<input type="text" name="username" /></div>

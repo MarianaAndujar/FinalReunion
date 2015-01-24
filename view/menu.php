@@ -33,7 +33,7 @@
 						else
 							echo '<li>';
 					?>
-					<a href="<?php echo BASE_URI;?>/create">Création Réunion</a></li>
+					<a href="<?php echo BASE_URI;?>/meetings/new">Création Réunion</a></li>
 			        <?php } ?>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">

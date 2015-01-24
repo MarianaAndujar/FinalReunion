@@ -48,6 +48,33 @@ class MMeeting{
 			die($e->getMessage());
 		}
 	}
+    
+    public static function getMeetingsByUID($uid){
+        try{
+            $dbh = new db();
+            
+            $owned_stmt = $dbh->prepare("SELECT * FROM MEETING 
+                WHERE `ID_USER` = :uid;");
+            
+            $owned_stmt->bindParam(":uid", $uid);
+            $owned_stmt->execute();
+            $owned = $owned_stmt->fetchAll(PDO::FETCH_ASSOC); 
+            
+            $participating_stmt = $dbh->prepare("SELECT `meeting`.*
+                FROM `meeting`, `available` 
+                WHERE `meeting`.`ID_MEETING` = `available`.`ID_MEETING` 
+                AND `meeting`.`OPEN` = 1 
+                AND `available`.`ID_USER` = :uid 
+                GROUP BY `meeting`.`id_meeting`");
+            $participating_stmt->bindParam(":uid", $uid);
+            $participating_stmt->execute();
+            $participating = $participating_stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            return array('owned'=> $owned, 'participating'=> $participating);
+        }catch(PDOException $e){
+            die($e->getMessage());
+        }
+    }
 	
 	/**
 	 * Récupération d'une réunion à partir de son id
@@ -87,7 +114,8 @@ class MMeeting{
             
             $stmt->execute();
             
-            return $stmt->fetch(PDO::FETCH_COLUMN)[0];
+            $result = $stmt->fetch(PDO::FETCH_COLUMN); 
+            return $result[0];
         }catch(PDOException $e){
             die($e->getMessage());
         }
@@ -265,20 +293,36 @@ class MMeeting{
     }
     
     
-    /**
-     * TODO
-     */
-    public static function deleteMeeting ($meeting_id, $user_id){
-
+    public static function closeMeeting ($meeting_id){
         try{
             // connexion
             $dbh = new db();
             
             // preparer la requete
-            $stmt = $dbh->prepare("DELETE FROM `available` WHERE `ID_MEETING` = 1;
-                DELETE FROM `hours` WHERE `ID_MEETING` = 1;
-                DELETE FROM `date` WHERE `ID_MEETING` = 1;
-                DELETE FROM `meeting` WHERE `ID_MEETING` = 1;");
+            $stmt = $dbh->prepare("UPDATE `project`.`meeting` 
+                SET `OPEN` = '0' WHERE `meeting`.`ID_MEETING` = :id_meeting;");
+            $stmt->bindParam(":id_meeting", $meeting_id);
+            
+            $stmt->execute();
+            
+            // deconnexion
+            $dbh = null;
+        }catch (PDOException $e){
+            die("exception");
+        }   
+    }
+    
+    public static function openMeeting ($meeting_id){
+        try{
+            // connexion
+            $dbh = new db();
+            
+            // preparer la requete
+            $stmt = $dbh->prepare("UPDATE `project`.`meeting` 
+                SET `OPEN` = '1' WHERE `meeting`.`ID_MEETING` = :id_meeting;");
+            $stmt->bindParam(":id_meeting", $meeting_id);
+            
+            $stmt->execute();
             
             // deconnexion
             $dbh = null;
