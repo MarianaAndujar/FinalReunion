@@ -54,7 +54,7 @@ class MMeeting{
 	 * 
 	 * @param int $meeting_id id de la réunion que l'on souhaite obtenir
 	 * 
-	 * @return mixed[] Renvoie la réunion comme un tableau associatif
+	 * @return mixed[] Renvoie la réunion comme un tableau associatif ou false
 	 */
 	public static function getMeetingById($meeting_id){
 		try{
@@ -71,6 +71,27 @@ class MMeeting{
 			die($e->getMessage());
 		}
 	}
+    
+    
+    public static function getMeetingMaxParticipation($meeting_id){
+        try{
+            $dbh = new db();
+            
+            $stmt = $dbh->prepare("SELECT max(availabilities_count.ac) max FROM (
+                SELECT count(*) AS ac FROM `hours`, `available`
+                WHERE `hours`.`id_hours` = `available`.`id_hours`
+                AND `hours`.`id_meeting` = :id_meeting
+                GROUP BY `hours`.`id_hours`) availabilities_count");
+                
+            $stmt->bindParam(":id_meeting", $meeting_id);
+            
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_COLUMN)[0];
+        }catch(PDOException $e){
+            die($e->getMessage());
+        }
+    }
 	
 	/**
 	 * Renvoie les participants d'une réunion
@@ -246,6 +267,29 @@ class MMeeting{
 			die("exception");
 		}	
     }
+    
+    
+    /**
+     * TODO
+     */
+    public static function deleteMeeting ($meeting_id, $user_id){
+
+        try{
+            // connexion
+            $dbh = new db();
+            
+            // preparer la requete
+            $stmt = $dbh->prepare("DELETE FROM `available` WHERE `ID_MEETING` = 1;
+                DELETE FROM `hours` WHERE `ID_MEETING` = 1;
+                DELETE FROM `date` WHERE `ID_MEETING` = 1;
+                DELETE FROM `meeting` WHERE `ID_MEETING` = 1;");
+            
+            // deconnexion
+            $dbh = null;
+        }catch (PDOException $e){
+            die("exception");
+        }   
+    }
 	
 	/*
 		Ajout d'une date d'un meeting
@@ -314,22 +358,6 @@ class MMeeting{
 			// connexion
 			$dbh = new db();
 			
-			if($username == null){
-				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
-					WHERE `ID_MEETING` = :meeting_id 
-					AND `ID_USER` = :uid");
-				$delete_stmt->bindParam(":meeting_id", $meeting_id);
-				$delete_stmt->bindParam(":uid", $uid);
-			}else{
-				$delete_stmt = $dbh->prepare("DELETE FROM `available` 
-					WHERE `ID_MEETING` = :meeting_id 
-					AND `OWNER` = :username");
-				$delete_stmt->bindParam(":meeting_id", $meeting_id);
-				$delete_stmt->bindParam(":username", $username);
-			}
-			
-			$delete_stmt->execute();
-			
 			// preparer la requete
 			/*
 			$stmt = $dbh->prepare("INSERT INTO `project`.`available` 
@@ -364,6 +392,33 @@ class MMeeting{
 			die("exception : " . $e->getMessage());
 		}
 	}
+
+    public static function deleteAvailabilities($meeting_id, $username, $uid){
+        try{
+            if($username == null && $uid == null)
+                die("username not set or not logged in");
+            
+            $dbh = new db();
+            
+            if($username == null){
+                $delete_stmt = $dbh->prepare("DELETE FROM `available` 
+                    WHERE `ID_MEETING` = :meeting_id 
+                    AND `ID_USER` = :uid");
+                $delete_stmt->bindParam(":meeting_id", $meeting_id);
+                $delete_stmt->bindParam(":uid", $uid);
+            }else{
+                $delete_stmt = $dbh->prepare("DELETE FROM `available` 
+                    WHERE `ID_MEETING` = :meeting_id 
+                    AND `OWNER` = :username");
+                $delete_stmt->bindParam(":meeting_id", $meeting_id);
+                $delete_stmt->bindParam(":username", $username);
+            }
+            
+            $delete_stmt->execute();
+        }catch (PDOException $e){
+            die("exception : " . $e->getMessage());
+        }
+    }
 	
 	public static function getMeetingId($subject, $user)
 	{

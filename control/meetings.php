@@ -70,11 +70,20 @@ class MeetingController extends CoreController{
 	 */
 	public static function showMeeting($meeting_id){
 		$meeting = MMeeting::getMeetingById($meeting_id);
-		$participants = MMeeting::getMeetingParticipants($meeting_id);
-		$dates = MMeeting::getMeetingDatesById($meeting_id);
-		require_once(VIEW_DIR . "showmeeting.php");
-		ShowMeetingView::render(array('meeting'=> $meeting, 
-			'participants'=>$participants, 'dates'=> $dates));
+        
+        if($meeting){
+            $participants = MMeeting::getMeetingParticipants($meeting_id);
+            $dates = MMeeting::getMeetingDatesById($meeting_id);
+            $max_participation = MMeeting::getMeetingMaxParticipation($meeting_id);
+            require_once(VIEW_DIR . "showmeeting.php");
+            ShowMeetingView::render(array('meeting'=> $meeting, 
+		      'participants'=>$participants, 'dates'=> $dates, 
+		      'max_participation'=>$max_participation));
+              
+        }else{
+            header("HTTP/1.1 404 Not found");
+            echo "no such meeting";
+        }
 	}
 	
 	/**
@@ -87,9 +96,11 @@ class MeetingController extends CoreController{
 		if($uid == null && $username == "")
 			die("not logged in and username not set");
 		
-		foreach($_POST['hours'] as $hour_id){
-			MMeeting::addAvailability($meeting_id, null, $hour_id, $username, $uid);
-		}
+        MMeeting::deleteAvailabilities($meeting_id, $username, $uid);
+        if(isset($_POST['hours']))
+    		foreach($_POST['hours'] as $hour_id)
+    			MMeeting::addAvailability($meeting_id, null, $hour_id, $username, $uid);
+		
 	}
 }
 

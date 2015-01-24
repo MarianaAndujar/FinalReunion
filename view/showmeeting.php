@@ -9,7 +9,11 @@ class ShowMeetingView{
 		?>
     <div class="container">
     	<h1>Participer</h1>
-    	
+    	   <?php if (isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $values['meeting']['ID_USER']): ?>
+			   <a href="<?php echo BASE_URI .'/meetings/edit/'. $values['meeting']['ID_MEETING'];?>">Editer</a>
+			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/xls';?>">Exporter (XLS)</a>
+			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/pdf';?>">Exporter (PDF)</a>
+		   <?php endif ?>
     	
 			<?php if(empty($values['dates'])){
 				?><p>Aucune date disponible pour cette réunion</p>
@@ -92,14 +96,14 @@ class ShowMeetingView{
 							<th class="timeline-non-header"><div></div></th>
 						</tr>
 						
-						<?php 
-						if(isset($values['participants']['uids'][0])) 
-							foreach ($values['participants']['uids'][0] as $participant){ 
-								if(isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $participant)
+						<?php
+						if(isset($values['participants']['uids'])) 
+							foreach ($values['participants']['uids'] as $participant){ 
+								if(isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $participant['id_user'])
 									continue;?>
 						<tr class="timeline-input">
 							<th class="timeline-non-header">
-								<div><?php echo MMembers::getLoginById($participant)[0];?></div>
+								<div><?php echo MMembers::getLoginById($participant['id_user'])[0];?></div>
 							</th>
 							<?php 
 							foreach($values['dates'] as $year){
@@ -108,7 +112,7 @@ class ShowMeetingView{
 										foreach($day['hours'] as $hour){
 											$availability = array_filter($hour['availabilities'][0], 
 												function($v) use($participant, $hour){
-													return $v['ID_USER'] == $participant && $v['ID_HOURS'] == $hour['hour']['ID_HOURS'];
+													return $v['ID_USER'] == $participant['id_user'] && $v['ID_HOURS'] == $hour['hour']['ID_HOURS'];
 												});
 											?>
 								<td>
@@ -125,12 +129,13 @@ class ShowMeetingView{
 						</tr>
 						<?php } ?>
 						
-						<?php if(isset($values['participants']['unames'][0])) 
-							foreach ($values['participants']['unames'][0] as $participant){ ?>
+						<?php
+						if(isset($values['participants']['unames'])) 
+							foreach ($values['participants']['unames'] as $participant){ ?>
 						<tr class="timeline-input">
 							<form method="post" action="<?php echo BASE_URI;?>/meetings/participate/<?php echo $values['meeting']['ID_MEETING'];?>">
 								<th class="timeline-non-header">
-									<div><input type="text" name="username" value="<?php echo $participant;?>" /></div>
+									<div><input type="text" name="username" value="<?php echo $participant['owner'];?>" /></div>
 								</th>
 								<?php 
 								foreach($values['dates'] as $year){
@@ -139,7 +144,7 @@ class ShowMeetingView{
 											foreach($day['hours'] as $hour){
 												$availability = array_filter($hour['availabilities'][0], 
 													function($v) use($participant, $hour){
-														return $v['OWNER'] == $participant && $v['ID_HOURS'] == $hour['hour']['ID_HOURS'];
+														return $v['OWNER'] == $participant['owner'] && $v['ID_HOURS'] == $hour['hour']['ID_HOURS'];
 													});
 												?>
 									<td>
@@ -147,7 +152,7 @@ class ShowMeetingView{
 											id="id_<?php echo $hour['hour']['ID_HOURS'];?>"
 											value="<?php echo $hour['hour']['ID_HOURS'];?>"
 											<?php if(sizeof($availability) > 0) echo "checked";?>
-										/>
+											name="hours[]" />
 									</td>
 								<?php }}}} ?>
 								<th class="timeline-non-header">
@@ -174,7 +179,7 @@ class ShowMeetingView{
 										foreach($month['days'] as $day){
 											foreach($day['hours'] as $hour){
 												$availability = isset($_SESSION['USER_ID'])?array_filter($hour['availabilities'][0], 
-													function($v) use($participant, $hour){
+													function($v) use($hour){
 														return $v['ID_USER'] == $_SESSION['USER_ID'] && $v['ID_HOURS'] == $hour['hour']['ID_HOURS'];
 													}):array();
 													?>
@@ -191,6 +196,32 @@ class ShowMeetingView{
 								</th>
 							</form>
 						</tr>
+						
+						<?php if (isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $values['meeting']['ID_USER']): ?>
+    						<tr class="timeline-results">
+                                    <th class="timeline-non-header">
+                                        <div>Résultats</div>
+                                    </th>
+                                    <?php 
+                                    foreach($values['dates'] as $year){
+                                        foreach($year['months'] as $month){
+                                            foreach($month['days'] as $day){
+                                                foreach($day['hours'] as $hour){
+                                                    $availabilities = $hour['availabilities'][0];
+                                                        ?>
+                                        <td <?php if(sizeof($availabilities) >= $values['max_participation'])
+                                                    echo "class =\"best-pick\"";?>>
+                                            <?php 
+                                                echo sizeof($availabilities);
+                                            ?>
+                                        </td>
+                                    <?php }}}} ?>
+                                    <th class="timeline-non-header">
+                                        <div></div>
+                                    </th>
+                                </form>
+                            </tr>
+                        <?php endif ?>
 					</tbody>
 				</table>
 			<?php }?>
