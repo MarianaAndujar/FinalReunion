@@ -135,11 +135,7 @@ class MMeeting{
 	 */
 	public static function getMeetingDatesById($meeting_id){
 		try{
-<<<<<<< HEAD
-			//$dates = [];
-=======
 			$dates = array();
->>>>>>> origin/master
 			$dbh = new db();
 			
 			$years_stmt = $dbh->prepare("SELECT DISTINCT year(`dday`)
