@@ -8,15 +8,16 @@ class ShowMeetingView{
 	public static function render($values){
 		?>
     <div class="container">
-    	<h1>Participer</h1>
+    	<h1><?php echo $values['meeting']['SUBJECT'] ?></h1>
+    	<p><?php echo $values['meeting']['DESCRIPTION'] ?></p>
     	   <?php if (isset($_SESSION['USER_ID']) && $_SESSION['USER_ID'] == $values['meeting']['ID_USER']): ?>
     	       <?php if ($values['meeting']['OPEN']): ?>
 				   <a href="<?php echo BASE_URI .'/meetings/close/'. $values['meeting']['ID_MEETING'];?>">Fermer</a>
 			   <?php else: ?>
 				   <a href="<?php echo BASE_URI .'/meetings/open/'. $values['meeting']['ID_MEETING'];?>">Ouvrir</a>
 			   <?php endif ?>
-			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/xls';?>">Exporter (XLS)</a>
-			   <a href="<?php echo BASE_URI .'/meetings/export/'. $values['meeting']['ID_MEETING'] . '/pdf';?>">Exporter (PDF)</a>
+			   <a href="<?php echo BASE_URI .'/export/xls/'. $values['meeting']['ID_MEETING'];?>">Exporter (XLS)</a>
+			   <a href="<?php echo BASE_URI .'/export/pdf/'. $values['meeting']['ID_MEETING'];?>">Exporter (PDF)</a>
 		   <?php endif ?>
     	
 			<?php if(empty($values['dates'])){
