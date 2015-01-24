@@ -136,6 +136,7 @@ class MeetingController extends CoreController{
             die("403");
         }
     }
+    
 }
 
 if(isset($_GET['action']))
@@ -173,6 +174,13 @@ switch($action){
             MeetingController::closeMeeting(intval($_GET['id']));
         else
             echo "id not found";
+        break;
+    case "export":
+        if(isset($_GET['id']) && isset($_GET['type']))
+            echo "todo: redirect";
+        else
+            echo "id not found";
+        break;
         break;
 	case "list":
 	default:
