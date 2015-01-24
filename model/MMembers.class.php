@@ -21,12 +21,8 @@ class MMembers{
 
     public function __destruct () {}
 	
-	/*
-	*
-	*	@function 		Add_Member
-	*
-	*	@description	Cette fonction permet de rajouter un utilisateur dans la 
-	*					base
+   /**
+	*	Cette fonction permet de rajouter un utilisateur dans la base
 	*
 	*	@Param 			$log	 		( Login de l'utilisateur )
 	*	@Param 			$name			( Nom de l'utilisateur )
@@ -73,12 +69,8 @@ class MMembers{
     }// Add_Member
 	
 	
-	/*
-	*
-	*	@function 		Get_Info
-	*
-	*	@description	Cette fonction permet de récupérer le mdp et le salt 
-	*					hashé
+   /**
+    * Cette fonction permet de récupérer le mdp et le salt hashé
 	*
 	*	@Param 			$login 		( Le login de l'utilisateur )
 	*
@@ -109,19 +101,16 @@ class MMembers{
 		
 	}// Get_Info
 	
-	
-	/*
-	*
-	*	@function 		Who_I_Am
-	*
-	*	@description	Permet de savoir si un compte existe déjà
-	*
-	*	@Param 			$login 		( Login de l'utilisateur )
-	*
-	*	@return			True si existe
-	*					False sinon
-	*
-	*/
+    
+   /**
+    * Permet de savoir si un compte existe déjà
+    *
+    *	@Param 			$login 		( Login de l'utilisateur )
+    *
+    *	@return			True si existe
+    *					False sinon
+    *
+    */
 	public function Who_I_Am($login)
 	{
 		try{
@@ -144,12 +133,10 @@ class MMembers{
 	}// Who_I_Am
 	
 	
-	/*
+   /**
 	*
-	*	@function 		update_User
-	*
-	*	@description	Cette fonction permet de modifier les informations 
-	*					générale d'un utilisateur
+    * Cette fonction permet de modifier les informations générale 
+    * d'un utilisateur
 	*
 	*	@Param 			$id 		( Sujet du meeting )
 	*	@Param 			$name		( description du meeting )
@@ -187,11 +174,9 @@ class MMembers{
 	}// update_User
 	
 	
-	/*
+   /**
 	*
-	*	@function 		getUser
-	*
-	*	@description	Récupère les info de base d'un utilisateur
+	*  Récupère les info de base d'un utilisateur
 	*
 	*	@Param 			$login 		( login de l'utilisateur)
 	*
@@ -227,12 +212,9 @@ class MMembers{
 	} // getUser
 	
 	
-	/*
+	/**
 	*
-	*	@function 		updateMdp
-	*
-	*	@description	Cette fonction permet de modifier le mdp d'un 
-	*					utilisateur
+	*  Cette fonction permet de modifier le mdp d'un utilisateur
 	*
 	*	@Param 			$id 		( Id de l'utilisateur )
 	*	@Param 			$mdp		( nouveau mot de passe )
@@ -260,12 +242,8 @@ class MMembers{
 	}
 	
 	
-	/*
-	*
-	*	@function 		getLoginById
-	*
-	*	@description	Cette fonction permet de récupérer le login ainsi que
-	*					le salt
+	/**
+	*  Cette fonction permet de récupérer le login ainsi que le salt
 	*
 	*	@Param 			$id 		( id de l'utilisateur )
 	*
@@ -295,11 +273,8 @@ class MMembers{
 	} // getLoginById
 	
 	
-    /*
-    *
-    *   @function       getUsernameById
-    *
-    *   @description    Cette fonction permet de récupérer le login 
+    /**
+    *   Cette fonction permet de récupérer le login 
     *
     *   @Param          $id         ( id de l'utilisateur )
     *

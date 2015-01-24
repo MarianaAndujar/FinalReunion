@@ -3,7 +3,6 @@
 *	@file   MMeeting.class.php
 * 
 *	@author Jivay Hay
-*	@author Black Butterfly 
 * 
 *	@date   21/01/2015
 * 

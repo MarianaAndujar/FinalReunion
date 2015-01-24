@@ -1,15 +1,22 @@
 <?php
 /**
- * Meeting controller
+ * @file meetings.php
+ * 
+ * @author Jivay Hay
+ * 
+ * @brief Meeting controller
  */
 
 require_once(dirname(__FILE__) . '/../config.inc.php');
 require_once(dirname(__FILE__) . '/corecontroller.php');
 require_once(MODEL_DIR . '/MMeeting.class.php');
-/**
- * 
- */
+
+
 class MeetingController extends CoreController{
+    
+    /**
+     * Affiche une liste de réunions en fonction de l'utilisateur connecté.
+     */
 	public static function listMeetings(){
 	    if(isset($_SESSION['USER_ID'])){
 	        require_once(VIEW_DIR . "listmeetings.php");
@@ -17,12 +24,15 @@ class MeetingController extends CoreController{
 	    }
 	}
 	
+    /**
+     * Affiche la vue de création de réunion
+     */
 	public static function newMeeting(){
 		include(VIEW_DIR . "newmeeting.php");
 	}
 	
 	/**
-	 * Si on était surs d'utiliser PHP5.6 on pourrait faire des filter (k,v)
+	 * Création d'une réunion à partir des données POST
 	 */
 	public static function createMeeting(){
 		if(!isset($_SESSION['USER_ID'])
@@ -69,7 +79,9 @@ class MeetingController extends CoreController{
 	}
 	
 	/**
-	 * 
+	 * Affiche une réunion si elle existe
+     * 
+     * @param int $meeting_id id de la réunion
 	 */
 	public static function showMeeting($meeting_id){
 		$meeting = MMeeting::getMeetingById($meeting_id);
@@ -95,7 +107,10 @@ class MeetingController extends CoreController{
 	}
 	
 	/**
-	 * 
+	 * Participer à une réunion
+     * Récupère le username ou l'uid à partir de POST
+     * 
+     * @param int $meeting_id id de la réunion
 	 */
 	public static function participateToMeeting($meeting_id){
 		$username = isset($_POST['username']) ? $_POST['username'] : null;
@@ -111,6 +126,11 @@ class MeetingController extends CoreController{
 		
 	}
     
+    /**
+     * Ouvrir une réunion aux sondages
+     * 
+     * @param int $meeting_id id de la réunion
+     */
     public static function openMeeting($meeting_id){
         if(isset($_SESSION['USER_ID'])){
             $meeting = MMeeting::getMeetingById($meeting_id);
@@ -123,6 +143,11 @@ class MeetingController extends CoreController{
         }
     }
     
+    /**
+     * Fermer une réunion aux sondages
+     * 
+     * @param int $meeting_id id de la réunion
+     */
     public static function closeMeeting($meeting_id){
         if(isset($_SESSION['USER_ID'])){
             $meeting = MMeeting::getMeetingById($meeting_id);
@@ -140,48 +165,50 @@ class MeetingController extends CoreController{
 if(isset($_GET['action']))
 	$action = $_GET['action'];
 else
+    //action par défaut
 	$action = "list";
+
 
 switch($action){
 	case "new":
+        //formulaire d'ajout d'une réunion
 		MeetingController::newMeeting();
 		break;
 	case "create":
+        //créer la réunion
 		MeetingController::createMeeting();
 		break;
 	case "show":
+        //afficher la réunion
 		if(isset($_GET['id']))
 			MeetingController::showMeeting(intval($_GET['id']));
 		else
 			echo "id not found";
 		break;
 	case "participate":
+        //participer à la réunion
 		if(isset($_GET['id']))
 			MeetingController::participateToMeeting(intval($_GET['id']));
 		else
 			echo "id not found";
 		break; 
     case "open":
+        //ouvrir la réunion aux votes
         if(isset($_GET['id']))
             MeetingController::openMeeting(intval($_GET['id']));
         else
             echo "id not found";
         break;
     case "close":
+        //fermer la réunion aux votes
         if(isset($_GET['id']))
             MeetingController::closeMeeting(intval($_GET['id']));
         else
             echo "id not found";
         break;
-    case "export":
-        if(isset($_GET['id']) && isset($_GET['type']))
-            echo "todo: redirect";
-        else
-            echo "id not found";
-        break;
-        break;
-	case "list":
+	case "list":        
 	default:
+        //afficher la liste des réunions
 		MeetingController::listMeetings();
 		break;
 }

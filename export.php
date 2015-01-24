@@ -60,7 +60,7 @@ $objPHPExcel->getActiveSheet()->setCellValueByColumnAndRow(0, 2, $meeting['DESCR
 $objPHPExcel->getActiveSheet()->mergeCells('A3:A5')
                               ->setCellValue('A4', strval($participation_count) . ' participants');
 
-//Generating years
+//Affichage des années
 $current_col = 1;
 foreach($dates as $year){
     $colspan = 0;
@@ -92,7 +92,7 @@ foreach($dates as $year){
 }
 
 
-//Generating months
+//Affichage des mois
 $current_col = 1;
 foreach($dates as $year)
     foreach($year['months'] as $month){
@@ -123,7 +123,7 @@ foreach($dates as $year)
         $current_col += $colspan;
     }
 
-//Generating days
+//Affichage des jours
 $current_col = 1;
 foreach($dates as $year)
     foreach($year['months'] as $month)
@@ -153,7 +153,7 @@ foreach($dates as $year)
         }
 
 
-//Generating hours
+//Affichage des heures
 $current_col = 1;
 foreach($dates as $year)
     foreach($year['months'] as $month)
@@ -186,7 +186,9 @@ foreach($dates as $year)
             }
 
 
-//Generating participation
+//Affichage des participations
+//Les utilisateurs par UID et username n'ayant pas de doublons, on les affiche
+//séparément
 $current_col = 1;
 $row_num = 7;
 if(isset($participants['uids'])) 
@@ -268,7 +270,8 @@ if(isset($participants['unames']))
         $row_num++;
     }
 
-//TODO: display best choice
+
+//Affichage des résultats
 $row_num++;
 $current_col = 1;
 foreach($dates as $year)
@@ -299,14 +302,14 @@ foreach($dates as $year)
                 $current_col++;                
             }
 
-// Rename worksheet
+//Renommer la spreadsheet et afficher les lignes pour discerner l'arborescence.
+//Les lignes ne s'affichent pas sans cette option sur les PDF.
 $objPHPExcel->getActiveSheet()->setTitle('Meeting report');
 $objPHPExcel->getActiveSheet()->setShowGridLines(true);
 
-// Set active sheet index to the first sheet, so Excel opens this as the first sheet
-$objPHPExcel->setActiveSheetIndex(0);
 
-
+//Envoi du fichier
+//Le reste est tiré de la doc PHPExcel
 if($type == "pdf"){
     $rendererName = PHPExcel_Settings::PDF_RENDERER_MPDF;
     $rendererLibrary = 'mpdf60';
@@ -327,7 +330,7 @@ if($type == "pdf"){
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
     $objWriter->save('php://output');
 }else{
-    
+    $objPHPExcel->setActiveSheetIndex(0);
     // Redirect output to a client’s web browser (Excel5)
     header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="report.xls"');
