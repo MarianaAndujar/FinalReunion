@@ -179,10 +179,9 @@ class MMembers{
 			
 			// deconnexion
 			$cnx = null;
-            
-            return $result ? $result[0] : $result;
 		}catch (PDOException $e){
 			die("exception : ". $e->getMessage());
 		}	
+		return $result;
 	}
 }

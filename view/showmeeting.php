@@ -103,7 +103,7 @@ class ShowMeetingView{
 									continue;?>
 						<tr class="timeline-input">
 							<th class="timeline-non-header">
-								<div><?php echo MMembers::getLoginById($participant['id_user']);?></div>
+								<div><?php echo MMembers::getLoginById($participant['id_user'])[0];?></div>
 							</th>
 							<?php 
 							foreach($values['dates'] as $year){
@@ -167,7 +167,7 @@ class ShowMeetingView{
 								<th class="timeline-non-header">
 									<div><?php 
 									if(isset($_SESSION['USER_ID'])){
-										echo MMembers::getLoginById($_SESSION['USER_ID']);
+										echo MMembers::getLoginById($_SESSION['USER_ID'])[0];
 										?><input type="hidden" name="uid" value="<?php echo $_SESSION['USER_ID'];?>" />
 									<?php }else{ ?>
 										<input type="text" name="username" /></div>
