@@ -4,7 +4,7 @@
 	require_once(dirname(__FILE__) . '/config.inc.php');
 
 	// affichage des vues de l'en tete et du sommaire 
-	include(VIEW_DIR . "header.html");	
+	include(VIEW_DIR . "header.php");	
 	include(VIEW_DIR . "menu.php");
 	
 	// instantiation de l'acces aux données

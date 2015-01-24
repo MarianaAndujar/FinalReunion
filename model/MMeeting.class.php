@@ -168,7 +168,8 @@ class MMeeting{
 			
 			$years_stmt = $dbh->prepare("SELECT DISTINCT year(`dday`)
 									FROM `DATE`
-									WHERE `id_meeting` = :id;");
+									WHERE `id_meeting` = :id
+                                    ORDER BY `dday`;");
 			$years_stmt->bindParam(":id", $meeting_id);
 			
 			$years_stmt->execute();
@@ -182,7 +183,8 @@ class MMeeting{
 				$months_stmt = $dbh->prepare("SELECT DISTINCT month(`dday`)
 										FROM `DATE`
 										WHERE `id_meeting` = :id
-										AND year(`dday`) = :year;");
+										AND year(`dday`) = :year
+										ORDER BY `dday`;");
 				$months_stmt->bindParam(":id", $meeting_id);
 				$months_stmt->bindParam(":year", $year);
 				
@@ -197,7 +199,8 @@ class MMeeting{
 										FROM `DATE`
 										WHERE `id_meeting` = :id
 										AND year(`dday`) = :year
-										AND month(`dday`) = :month;");
+										AND month(`dday`) = :month
+                                        ORDER BY `dday`;");
 										
 					$days_stmt->bindParam(":id", $meeting_id);
 					$days_stmt->bindParam(":year", $year);
@@ -217,7 +220,8 @@ class MMeeting{
 															WHERE `id_meeting` = :id 
 															AND year(`dday`) = :year	
 															AND month(`dday`) = :month 
-															AND day(`dday`) = :day);");
+															AND day(`dday`) = :day)
+													ORDER BY `bhour`;");
 						
 						$hours_stmt->bindParam(":id", $meeting_id);
 						$hours_stmt->bindParam(":year", $year);
